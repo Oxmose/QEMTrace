@@ -46,6 +46,7 @@
     | dh_sizemask(t5, 5) | dh_sizemask(t6, 6) },
 
 #include "helper.h"
+#include "../../QEMTrace/helper.h"
 #include "trace/generated-helpers.h"
 #include "tcg-runtime.h"
 

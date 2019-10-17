@@ -216,13 +216,13 @@ void qem_trace_disable(void)
 #endif
 }
 
-void qem_trace_start_time(void)
+void qem_trace_start_timer(void)
 {
     /* Save the current time */
     qem_time_start = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
 }
 
-void qem_trace_output_time(void)
+void qem_trace_get_timer(void)
 {
     /* Get the current time and compares it to the previously defined start
      * time.
