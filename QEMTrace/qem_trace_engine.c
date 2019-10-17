@@ -90,9 +90,9 @@ static void qem_write_header(const uint64_t size, const uint32_t trace_size,
     /* Write the header */
     error = fwrite(&header, sizeof(qem_trace_header_t),
                    1, qem_trace_file_fd);
-    if(error != 0)
+    if(error != 1)
     {
-        QEM_TRACE_ERROR("Could write the header", error, 1);
+        QEM_TRACE_ERROR("Could not write the header", error, 1);
     }
 
     /* Reset the buffer size */
@@ -105,7 +105,7 @@ static void qem_init_tracing(void)
      * allow us to gain a lot of time
      */
     char filename[23];
-    sprintf(filename, "qem_trace_%08d.out", file_index++);
+    sprintf(filename, "qem_trace_%08d.out", qem_file_index++);
     filename[22] = 0;
     remove(filename);
 
@@ -118,11 +118,11 @@ static void qem_init_tracing(void)
     }
 
     /* Init the header space */
-    write_header(0, sizeof(qem_trace_t), 1);
-    file_size = sizeof(qem_trace_t);
+    qem_write_header(0, sizeof(qem_trace_t), 1);
+    qem_file_size = sizeof(qem_trace_t);
 
     QEM_TRACE_INFO("==== Trace file name", 0);
-    QEM_TRACE_INFO(filename);
+    QEM_TRACE_INFO(filename, 0);
 }
 
 static void qem_close_tracing(void)
@@ -135,17 +135,17 @@ static void qem_close_tracing(void)
         error = fwrite(qem_trace_buffer, sizeof(qem_trace_t),
                        qem_trace_buffer_size, qem_trace_file_fd);
 
-        if(error != 0)
+        if(error != qem_trace_buffer_size)
         {
-            QEM_TRACE_ERROR("Could flush trace buffer", error, 1);
+            QEM_TRACE_ERROR("Could not flush trace buffer", error, 1);
         }
 
-        file_size += qem_trace_buffer_size * sizeof(qem_trace_t);
+        qem_file_size += qem_trace_buffer_size * sizeof(qem_trace_t);
 
         qem_trace_buffer_size = 0;
     }
 
-    write_header(file_size, sizeof(qem_trace_t), 1);
+    qem_write_header(qem_file_size, sizeof(qem_trace_t), 1);
 
     /* Close file */
     if(fclose(qem_trace_file_fd) < 0)
@@ -256,12 +256,12 @@ void qem_trace_output(uint32_t virt_addr, uint32_t phys_addr,
         error = fwrite(qem_trace_buffer, sizeof(qem_trace_t),
                        QEM_TRACE_BUFFER_SIZE, qem_trace_file_fd);
 
-        if(error != 0)
+        if(error != QEM_TRACE_BUFFER_SIZE)
         {
-            QEM_TRACE_ERROR("Could flush trace buffer", error, 1);
+            QEM_TRACE_ERROR("Could not flush trace buffer", error, 1);
         }
 
-        file_size += QEM_TRACE_BUFFER_SIZE * sizeof(qem_trace_t);
+        qem_file_size += QEM_TRACE_BUFFER_SIZE * sizeof(qem_trace_t);
 
         qem_trace_buffer_size = 0;
      }
