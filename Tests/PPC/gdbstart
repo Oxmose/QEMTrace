@@ -1,0 +1,4 @@
+tar rem:1234
+layout asm
+b *0x3000
+c

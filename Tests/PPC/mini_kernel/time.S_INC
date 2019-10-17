@@ -1,0 +1,44 @@
+#-------------------------------------------------------------------------------
+# TRACE ENABLED TIMING
+#-------------------------------------------------------------------------------
+
+# Start Qemu counter
+.long 0xFFFFFFF2
+
+bl long_loop
+
+# Stop Qemu counter and display
+.long 0xFFFFFFF3
+
+#-------------------------------------------------------------------------------
+# TRACE DISABLED TIMING
+#-------------------------------------------------------------------------------
+
+# Disable tracing
+.long 0xFFFFFFF1
+
+# Start Qemu counter
+.long 0xFFFFFFF2
+
+bl long_loop
+
+# Stop Qemu counter and display
+.long 0xFFFFFFF3
+
+b end
+
+
+long_loop:
+
+	lis r3,10 
+	li r4, 0x7000
+	li r5, 0
+actual_loop:
+	stw r3, 0(r4)
+	addi r4, r4, 1
+	addi r3, r3, -1
+	cmp 0, 0, r3, r5 /* Compare r3 with r4, cr0 bit 2 is set on equality */
+    bne cr0, actual_loop
+	blr
+
+end:
