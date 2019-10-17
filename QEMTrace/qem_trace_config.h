@@ -34,15 +34,21 @@
 #define QEM_TRACE_ENABLED 1
 
 /******************************
+ * Trace instructions 
+ *****************************/
+#define QEM_TRACE_START_OP          0xFFFFFFF0
+#define QEM_TRACE_STOP_OP           0xFFFFFFF1
+#define QEM_TRACE_START_TIMER_OP    0xFFFFFFF2
+#define QEM_TRACE_GET_TIMER_OP      0xFFFFFFF3
+#define QEM_TRACE_FLASH_INV_INST_OP 0xFFFFFFF4
+#define QEM_TRACE_FLASH_INV_DATA_OP 0xFFFFFFF5
+    
+/******************************
  * Trace type 
  *****************************/
 
 /* Print trace to stdio (1) or output file(0) */
 #define QEM_TRACE_PRINT 1
-
-/******************************
- * Trace type 
- *****************************/
 
 /* Modify this value depending on the system you want to trace
  * 0 = 32 Bits target

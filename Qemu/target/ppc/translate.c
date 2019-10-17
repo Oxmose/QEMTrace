@@ -35,6 +35,15 @@
 #include "exec/log.h"
 #include "qemu/atomic128.h"
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#include "../../QEMTrace/qem_trace_engine.h"
+#include "../../QEMTrace/qem_trace_config.h"
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
 
 #define CPU_SINGLE_STEP 0x1
 #define CPU_BRANCH_STEP 0x2
@@ -79,6 +88,176 @@ static TCGv cpu_fpscr;
 static TCGv_i32 cpu_access_type;
 
 #include "exec/gen-icount.h"
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+static void gen_qem_instld_trace(const target_ulong cur_eip, const int size)
+{
+    /* Call the trace helper */
+    TCGv t0 = tcg_const_tl(cur_eip);
+    TCGv_i32 t1 = tcg_const_i32(size);
+    gen_helper_qem_instld_trace(cpu_env, t0, t1);
+    tcg_temp_free(t0);
+    tcg_temp_free_i32(t1);
+}
+
+/**************************************** LOAD ********************************/
+
+static void gen_qem_datald_trace(const target_ulong simm, const int reg,
+                             const int size)
+{
+    /* Call the trace helper */
+    TCGv t0 = tcg_const_tl(simm);
+    TCGv_i32 t1 = tcg_const_i32(reg);
+    TCGv_i32 t2 = tcg_const_i32(size);
+    gen_helper_qem_datald_trace(cpu_env, t0, t1, t2);
+    tcg_temp_free(t0);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+}
+
+static void gen_qem_datald_trace_trad(const int reg0, const int reg1,
+                                  const int size)
+{
+    /* Call the trace helper */
+    TCGv_i32 t0 = tcg_const_i32(reg0);
+    TCGv_i32 t1 = tcg_const_i32(reg1);
+    TCGv_i32 t2 = tcg_const_i32(size);
+    gen_helper_qem_datald_trace_trad(cpu_env, t0, t1, t2);
+    tcg_temp_free_i32(t0);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+}
+
+static void gen_qem_datald_trace_ld8u(const target_ulong simm, const int reg)
+{
+    gen_qem_datald_trace(simm, reg, 1);
+}
+static void gen_qem_datald_trace_ld16u(const target_ulong simm, const int reg)
+{
+    gen_qem_datald_trace(simm, reg, 2);
+}
+static void gen_qem_datald_trace_ld16ur(const target_ulong simm, const int reg)
+{
+    gen_qem_datald_trace(simm, reg, 2);
+}
+static void gen_qem_datald_trace_ld16s(const target_ulong simm, const int reg)
+{
+    gen_qem_datald_trace(simm, reg, 2);
+}
+static void gen_qem_datald_trace_ld32u(const target_ulong simm, const int reg)
+{
+    gen_qem_datald_trace(simm, reg, 4);
+}
+static void gen_qem_datald_trace_ld32ur(const target_ulong simm, const int reg)
+{
+    gen_qem_datald_trace(simm, reg, 4);
+}
+static void gen_qem_datald_trace_ld32s(const target_ulong simm, const int reg)
+{
+    gen_qem_datald_trace(simm, reg, 4);
+}
+static void gen_qem_datald_trace_ld64(const target_ulong simm, const int reg)
+{
+    gen_qem_datald_trace(simm, reg, 8);
+}
+#if defined TARGET_PPC64
+static void gen_qem_datald_trace_ld64_i64(const target_ulong simm, const int reg)
+{
+    gen_qem_datald_trace(simm, reg, 8);
+}
+static void gen_qem_datald_trace_ld64ur(const target_ulong simm, const int reg)
+{
+    gen_qem_datald_trace(simm, reg, 8);
+}
+static void gen_qem_datald_trace_ldarx(const target_ulong simm, const int reg)
+{
+    gen_qem_datald_trace(simm, reg, 8);
+}
+#endif /* TARGET_PPC64 */
+
+/*************************************** STORE ********************************/
+
+static void gen_qem_datast_trace(const target_ulong simm, const int reg,
+                             const int size)
+{
+    /* Call the trace helper */
+    TCGv t0 = tcg_const_tl(simm);
+    TCGv_i32 t1 = tcg_const_i32(reg);
+    TCGv_i32 t2 = tcg_const_i32(size);
+    gen_helper_qem_datast_trace(cpu_env, t0, t1, t2);
+    tcg_temp_free(t0);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+}
+
+static void gen_qem_datast_trace_trad(const int reg0, const int reg1,
+                                  const int size)
+{
+    /* Call the trace helper */
+    TCGv_i32 t0 = tcg_const_i32(reg0);
+    TCGv_i32 t1 = tcg_const_i32(reg1);
+    TCGv_i32 t2 = tcg_const_i32(size);
+    gen_helper_qem_datast_trace_trad(cpu_env, t0, t1, t2);
+    tcg_temp_free_i32(t0);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+}
+
+static void gen_qem_dcbz_trace_trad(const int reg0, const int reg1,
+                                const int size)
+{
+    /* Call the trace helper */
+    TCGv_i32 t0 = tcg_const_i32(reg0);
+    TCGv_i32 t1 = tcg_const_i32(reg1);
+    TCGv_i32 t2 = tcg_const_i32(size);
+    gen_helper_qem_dcbz_trace_trad(cpu_env, t0, t1, t2);
+    tcg_temp_free_i32(t0);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+}
+
+static void gen_qem_datast_trace_st8(const target_ulong simm, const int reg)
+{
+    gen_qem_datast_trace(simm, reg, 1);
+}
+static void gen_qem_datast_trace_st16(const target_ulong simm, const int reg)
+{
+    gen_qem_datast_trace(simm, reg, 2);
+}
+static void gen_qem_datast_trace_st16r(const target_ulong simm, const int reg)
+{
+    gen_qem_datast_trace(simm, reg, 2);
+}
+static void gen_qem_datast_trace_st32(const target_ulong simm, const int reg)
+{
+    gen_qem_datast_trace(simm, reg, 4);
+}
+static void gen_qem_datast_trace_st32r(const target_ulong simm, const int reg)
+{
+    gen_qem_datast_trace(simm, reg, 4);
+}
+static void gen_qem_datast_trace_st64(const target_ulong simm, const int reg)
+{
+    gen_qem_datast_trace(simm, reg, 8);
+}
+#if defined TARGET_PPC64
+static void gen_qem_datast_trace_st64_i64(const target_ulong simm, const int reg)
+{
+    gen_qem_datast_trace(simm, reg, 8);
+}
+static void gen_qem_datast_trace_st64r(const target_ulong simm, const int reg)
+{
+    gen_qem_datast_trace(simm, reg, 8);
+}
+#endif /* TARGET_PPC64 */
+
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 
 void ppc_translate_init(void)
 {
@@ -2432,13 +2611,36 @@ static inline void gen_align_no_le(DisasContext *ctx)
 #define DEF_MEMOP(op) ((op) | ctx->default_tcg_memop_mask)
 #define BSWAP_MEMOP(op) ((op) | (ctx->default_tcg_memop_mask ^ MO_BSWAP))
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
 #define GEN_QEMU_LOAD_TL(ldop, op)                                      \
 static void glue(gen_qemu_, ldop)(DisasContext *ctx,                    \
                                   TCGv val,                             \
                                   TCGv addr)                            \
 {                                                                       \
     tcg_gen_qemu_ld_tl(val, addr, ctx->mem_idx, op);                    \
+    gen_qem_datald_trace_##ldop(SIMM(ctx->opcode), rA(ctx->opcode));    \
 }
+
+#else
+
+#define GEN_QEMU_LOAD_TL(ldop, op)                                      \
+static void glue(gen_qemu_, ldop)(DisasContext *ctx,                    \
+                                  TCGv val,                             \
+                                  TCGv addr)                            \
+{                                                                       \
+    tcg_gen_qemu_ld_tl(val, addr, ctx->mem_idx, op);                    \
+    
+}
+
+#endif /* QEM_TRACE_ENABLED */
+
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 
 GEN_QEMU_LOAD_TL(ld8u,  DEF_MEMOP(MO_UB))
 GEN_QEMU_LOAD_TL(ld16u, DEF_MEMOP(MO_UW))
@@ -2449,6 +2651,43 @@ GEN_QEMU_LOAD_TL(ld32s, DEF_MEMOP(MO_SL))
 GEN_QEMU_LOAD_TL(ld16ur, BSWAP_MEMOP(MO_UW))
 GEN_QEMU_LOAD_TL(ld32ur, BSWAP_MEMOP(MO_UL))
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+#define GEN_QEMU_LOAD_TL_NT(ldop, op)                                   \
+static void glue(gen_qemu_qem_notrace_, ldop)(DisasContext *ctx,            \
+                                  TCGv val,                             \
+                                  TCGv addr)                            \
+{                                                                       \
+    tcg_gen_qemu_ld_tl(val, addr, ctx->mem_idx, op);                    \
+}
+
+
+GEN_QEMU_LOAD_TL_NT(ld8u,  DEF_MEMOP(MO_UB))
+
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+#define GEN_QEMU_LOAD_64(ldop, op)                                  \
+static void glue(gen_qemu_, glue(ldop, _i64))(DisasContext *ctx,    \
+                                             TCGv_i64 val,          \
+                                             TCGv addr)             \
+{                                                                   \
+    tcg_gen_qemu_ld_i64(val, addr, ctx->mem_idx, op);               \
+    gen_qem_datald_trace_##ldop(SIMM(ctx->opcode), rA(ctx->opcode));    \
+}
+
+#else 
+
 #define GEN_QEMU_LOAD_64(ldop, op)                                  \
 static void glue(gen_qemu_, glue(ldop, _i64))(DisasContext *ctx,    \
                                              TCGv_i64 val,          \
@@ -2456,6 +2695,11 @@ static void glue(gen_qemu_, glue(ldop, _i64))(DisasContext *ctx,    \
 {                                                                   \
     tcg_gen_qemu_ld_i64(val, addr, ctx->mem_idx, op);               \
 }
+
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 
 GEN_QEMU_LOAD_64(ld8u,  DEF_MEMOP(MO_UB))
 GEN_QEMU_LOAD_64(ld16u, DEF_MEMOP(MO_UW))
@@ -2467,6 +2711,40 @@ GEN_QEMU_LOAD_64(ld64,  DEF_MEMOP(MO_Q))
 GEN_QEMU_LOAD_64(ld64ur, BSWAP_MEMOP(MO_Q))
 #endif
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+#define GEN_QEMU_LOAD_64_NT(ldop, op)                                      \
+static void glue(gen_qemu_qem_notrace_, glue(ldop, _i64))(DisasContext *ctx,   \
+                                             TCGv_i64 val,                 \
+                                             TCGv addr)                    \
+{                                                                          \
+    tcg_gen_qemu_ld_i64(val, addr, ctx->mem_idx, op);                      \
+}
+
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+#define GEN_QEMU_STORE_TL(stop, op)                                     \
+static void glue(gen_qemu_, stop)(DisasContext *ctx,                    \
+                                  TCGv val,                             \
+                                  TCGv addr)                            \
+{                                                                       \
+    tcg_gen_qemu_st_tl(val, addr, ctx->mem_idx, op);                    \
+    gen_qem_datast_trace_##stop(SIMM(ctx->opcode), rA(ctx->opcode));        \
+}
+
+#else 
+
 #define GEN_QEMU_STORE_TL(stop, op)                                     \
 static void glue(gen_qemu_, stop)(DisasContext *ctx,                    \
                                   TCGv val,                             \
@@ -2475,12 +2753,52 @@ static void glue(gen_qemu_, stop)(DisasContext *ctx,                    \
     tcg_gen_qemu_st_tl(val, addr, ctx->mem_idx, op);                    \
 }
 
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 GEN_QEMU_STORE_TL(st8,  DEF_MEMOP(MO_UB))
 GEN_QEMU_STORE_TL(st16, DEF_MEMOP(MO_UW))
 GEN_QEMU_STORE_TL(st32, DEF_MEMOP(MO_UL))
 
 GEN_QEMU_STORE_TL(st16r, BSWAP_MEMOP(MO_UW))
 GEN_QEMU_STORE_TL(st32r, BSWAP_MEMOP(MO_UL))
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+#define GEN_QEMU_STORE_TL_NT(stop, op)                                  \
+static void glue(gen_qemu_qem_notrace_, stop)(DisasContext *ctx,            \
+                                  TCGv val,                             \
+                                  TCGv addr)                            \
+{                                                                       \
+    tcg_gen_qemu_st_tl(val, addr, ctx->mem_idx, op);                    \
+}
+
+GEN_QEMU_STORE_TL_NT(st8,  DEF_MEMOP(MO_UB))
+
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+#define GEN_QEMU_STORE_64(stop, op)                               \
+static void glue(gen_qemu_, glue(stop, _i64))(DisasContext *ctx,  \
+                                              TCGv_i64 val,       \
+                                              TCGv addr)          \
+{                                                                 \
+    tcg_gen_qemu_st_i64(val, addr, ctx->mem_idx, op);             \
+    gen_qem_datast_trace_##stop(SIMM(ctx->opcode), rA(ctx->opcode));  \
+}
+
+#else 
 
 #define GEN_QEMU_STORE_64(stop, op)                               \
 static void glue(gen_qemu_, glue(stop, _i64))(DisasContext *ctx,  \
@@ -2490,6 +2808,11 @@ static void glue(gen_qemu_, glue(stop, _i64))(DisasContext *ctx,  \
     tcg_gen_qemu_st_i64(val, addr, ctx->mem_idx, op);             \
 }
 
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
 GEN_QEMU_STORE_64(st8,  DEF_MEMOP(MO_UB))
 GEN_QEMU_STORE_64(st16, DEF_MEMOP(MO_UW))
 GEN_QEMU_STORE_64(st32, DEF_MEMOP(MO_UL))
@@ -2498,6 +2821,24 @@ GEN_QEMU_STORE_64(st64, DEF_MEMOP(MO_Q))
 #if defined(TARGET_PPC64)
 GEN_QEMU_STORE_64(st64r, BSWAP_MEMOP(MO_Q))
 #endif
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+#define GEN_QEMU_STORE_64_NT(stop, op)                               \
+static void glue(gen_qemu_qem_notrace_, glue(stop, _i64))(DisasContext *ctx,  \
+                                              TCGv_i64 val,       \
+                                              TCGv addr)          \
+{                                                                 \
+    tcg_gen_qemu_st_i64(val, addr, ctx->mem_idx, op);             \
+}
+
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 
 #define GEN_LD(name, ldop, opc, type)                                         \
 static void glue(gen_, name)(DisasContext *ctx)                                       \
@@ -3139,8 +3480,19 @@ static void gen_load_locked(DisasContext *ctx, TCGMemOp memop)
     tcg_gen_mov_tl(cpu_reserve, t0);
     tcg_gen_mov_tl(cpu_reserve_val, gpr);
     tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
+/*******************************************************************************
+ * QEMTrace START 
+ ******************************************************************************/ 
+#if QEM_TRACE_ENABLED
+    gen_qem_datald_trace_trad(rA(ctx->opcode), rB(ctx->opcode), 
+                          MEMOP_GET_SIZE(memop));
+#endif /* QEM_TRACE_ENABLED */
+/******************************************************************************* 
+ * QEMTrace END 
+ ******************************************************************************/ 
     tcg_temp_free(t0);
 }
+
 
 #define LARX(name, memop)                  \
 static void gen_##name(DisasContext *ctx)  \
@@ -3193,6 +3545,18 @@ static void gen_ld_atomic(DisasContext *ctx, TCGMemOp memop)
 
     need_serial = false;
     memop |= MO_ALIGN;
+
+/*******************************************************************************
+ * QEMTrace START 
+ ******************************************************************************/ 
+#if QEM_TRACE_ENABLED
+    gen_qem_datald_trace_trad(rA(ctx->opcode), rB(ctx->opcode), 
+                          MEMOP_GET_SIZE(memop));
+#endif /* QEM_TRACE_ENABLED */
+/******************************************************************************* 
+ * QEMTrace END 
+ ******************************************************************************/ 
+
     switch (gpr_FC) {
     case 0: /* Fetch and add */
         tcg_gen_atomic_fetch_add_tl(dst, EA, src, ctx->mem_idx, memop);
@@ -3303,6 +3667,17 @@ static void gen_st_atomic(DisasContext *ctx, TCGMemOp memop)
     discard = tcg_temp_new();
 
     memop |= MO_ALIGN;
+/*******************************************************************************
+ * QEMTrace START 
+ ******************************************************************************/ 
+#if QEM_TRACE_ENABLED
+    gen_qem_datald_trace_trad(rA(ctx->opcode), rB(ctx->opcode), 
+                          MEMOP_GET_SIZE(memop));
+#endif /* QEM_TRACE_ENABLED */
+/******************************************************************************* 
+ * QEMTrace END 
+ ******************************************************************************/ 
+
     switch (gpr_FC) {
     case 0: /* add and Store */
         tcg_gen_atomic_add_fetch_tl(discard, EA, src, ctx->mem_idx, memop);
@@ -3396,6 +3771,18 @@ static void gen_conditional_store(DisasContext *ctx, TCGMemOp memop)
     tcg_gen_or_tl(t0, t0, cpu_so);
     tcg_gen_trunc_tl_i32(cpu_crf[0], t0);
     tcg_temp_free(t0);
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    gen_qem_datast_trace_trad(rA(ctx->opcode), rB(ctx->opcode),
+                          MEMOP_GET_SIZE(memop));
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     tcg_gen_br(l2);
 
     gen_set_label(l1);
@@ -3420,6 +3807,161 @@ STCX(sthcx_, DEF_MEMOP(MO_UW))
 STCX(stwcx_, DEF_MEMOP(MO_UL))
 
 #if defined(TARGET_PPC64)
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+/* ldarx */
+LARX(ldarx, DEF_MEMOP(MO_Q))
+/* stdcx. */
+STCX(stdcx_, DEF_MEMOP(MO_Q))
+
+/* lqarx */
+static void gen_lqarx(DisasContext *ctx)
+{
+    int rd = rD(ctx->opcode);
+    TCGv EA, hi, lo;
+
+    if (unlikely((rd & 1) || (rd == rA(ctx->opcode)) ||
+                 (rd == rB(ctx->opcode)))) {
+        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+        return;
+    }
+
+    gen_set_access_type(ctx, ACCESS_RES);
+    EA = tcg_temp_new();
+    gen_addr_reg_index(ctx, EA);
+
+    /* Note that the low part is always in RD+1, even in LE mode.  */
+    lo = cpu_gpr[rd + 1];
+    hi = cpu_gpr[rd];
+
+    if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
+        if (HAVE_ATOMIC128) {
+            TCGv_i32 oi = tcg_temp_new_i32();
+            if (ctx->le_mode) {
+                tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ | MO_ALIGN_16,
+                                                    ctx->mem_idx));
+                gen_helper_lq_le_parallel(lo, cpu_env, EA, oi);
+            } else {
+                tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ | MO_ALIGN_16,
+                                                    ctx->mem_idx));
+                gen_helper_lq_be_parallel(lo, cpu_env, EA, oi);
+            }
+            tcg_temp_free_i32(oi);
+            tcg_gen_ld_i64(hi, cpu_env, offsetof(CPUPPCState, retxh));
+            gen_qem_datald_trace_ld64_i64(rA(ctx->opcode), rB(ctx->opcode) + 8);
+        } else {
+            /* Restart with exclusive lock.  */
+            gen_helper_exit_atomic(cpu_env);
+            ctx->base.is_jmp = DISAS_NORETURN;
+            tcg_temp_free(EA);
+            return;
+        }
+    } else if (ctx->le_mode) {
+        tcg_gen_qemu_ld_i64(lo, EA, ctx->mem_idx, MO_LEQ | MO_ALIGN_16);
+        gen_qem_datald_trace_ld64_i64(rA(ctx->opcode), rB(ctx->opcode));
+        tcg_gen_mov_tl(cpu_reserve, EA);
+        gen_addr_add(ctx, EA, EA, 8);
+        tcg_gen_qemu_ld_i64(hi, EA, ctx->mem_idx, MO_LEQ);
+        gen_qem_datald_trace_ld64_i64(rA(ctx->opcode), rB(ctx->opcode) + 8);
+    } else {
+        tcg_gen_qemu_ld_i64(hi, EA, ctx->mem_idx, MO_BEQ | MO_ALIGN_16);
+        gen_qem_datald_trace_ld64_i64(rA(ctx->opcode), rB(ctx->opcode));
+        tcg_gen_mov_tl(cpu_reserve, EA);
+        gen_addr_add(ctx, EA, EA, 8);
+        tcg_gen_qemu_ld_i64(lo, EA, ctx->mem_idx, MO_BEQ);
+        gen_qem_datald_trace_ld64_i64(rA(ctx->opcode), rB(ctx->opcode) + 8);
+    }
+    tcg_temp_free(EA);
+
+    tcg_gen_st_tl(hi, cpu_env, offsetof(CPUPPCState, reserve_val));
+    tcg_gen_st_tl(lo, cpu_env, offsetof(CPUPPCState, reserve_val2));
+}
+
+/* stqcx. */
+static void gen_stqcx_(DisasContext *ctx)
+{
+    int rs = rS(ctx->opcode);
+    TCGv EA, hi, lo;
+
+    if (unlikely(rs & 1)) {
+        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+        return;
+    }
+
+    gen_set_access_type(ctx, ACCESS_RES);
+    EA = tcg_temp_new();
+    gen_addr_reg_index(ctx, EA);
+
+    /* Note that the low part is always in RS+1, even in LE mode.  */
+    lo = cpu_gpr[rs + 1];
+    hi = cpu_gpr[rs];
+
+    if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
+        if (HAVE_CMPXCHG128) {
+            TCGv_i32 oi = tcg_const_i32(DEF_MEMOP(MO_Q) | MO_ALIGN_16);
+            if (ctx->le_mode) {
+                gen_helper_stqcx_le_parallel(cpu_crf[0], cpu_env,
+                                             EA, lo, hi, oi);
+            } else {
+                gen_helper_stqcx_be_parallel(cpu_crf[0], cpu_env,
+                                             EA, lo, hi, oi);
+            }
+            tcg_temp_free_i32(oi);
+        } else {
+            /* Restart with exclusive lock.  */
+            gen_helper_exit_atomic(cpu_env);
+            ctx->base.is_jmp = DISAS_NORETURN;
+        }
+        tcg_temp_free(EA);
+    } else {
+        TCGLabel *lab_fail = gen_new_label();
+        TCGLabel *lab_over = gen_new_label();
+        TCGv_i64 t0 = tcg_temp_new_i64();
+        TCGv_i64 t1 = tcg_temp_new_i64();
+
+        tcg_gen_brcond_tl(TCG_COND_NE, EA, cpu_reserve, lab_fail);
+        tcg_temp_free(EA);
+
+        gen_qemu_ld64_i64(ctx, t0, cpu_reserve);
+        tcg_gen_ld_i64(t1, cpu_env, (ctx->le_mode
+                                     ? offsetof(CPUPPCState, reserve_val2)
+                                     : offsetof(CPUPPCState, reserve_val)));
+        tcg_gen_brcond_i64(TCG_COND_NE, t0, t1, lab_fail);
+
+        tcg_gen_addi_i64(t0, cpu_reserve, 8);
+        gen_qemu_ld64_i64(ctx, t0, t0);
+        tcg_gen_ld_i64(t1, cpu_env, (ctx->le_mode
+                                     ? offsetof(CPUPPCState, reserve_val)
+                                     : offsetof(CPUPPCState, reserve_val2)));
+        tcg_gen_brcond_i64(TCG_COND_NE, t0, t1, lab_fail);
+
+        /* Success */
+        gen_qemu_st64_i64(ctx, ctx->le_mode ? lo : hi, cpu_reserve);
+        gen_qem_datast_trace_st64_i64(rA(ctx->opcode), rB(ctx->opcode));
+        tcg_gen_addi_i64(t0, cpu_reserve, 8);
+        gen_qemu_st64_i64(ctx, ctx->le_mode ? hi : lo, t0);
+        gen_qem_datast_trace_st64_i64(rA(ctx->opcode), rB(ctx->opcode) + 8);
+
+        tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
+        tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], CRF_EQ);
+        tcg_gen_br(lab_over);
+
+        gen_set_label(lab_fail);
+        tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
+
+        gen_set_label(lab_over);
+        tcg_gen_movi_tl(cpu_reserve, -1);
+        tcg_temp_free_i64(t0);
+        tcg_temp_free_i64(t1);
+    }
+}
+
+#else 
+
 /* ldarx */
 LARX(ldarx, DEF_MEMOP(MO_Q))
 /* stdcx. */
@@ -3560,7 +4102,10 @@ static void gen_stqcx_(DisasContext *ctx)
     }
 }
 #endif /* defined(TARGET_PPC64) */
-
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 /* sync */
 static void gen_sync(DisasContext *ctx)
 {
@@ -4453,7 +4998,24 @@ static void gen_dcbf(DisasContext *ctx)
     gen_set_access_type(ctx, ACCESS_CACHE);
     t0 = tcg_temp_new();
     gen_addr_reg_index(ctx, t0);
-    gen_qemu_ld8u(ctx, t0, t0);
+    gen_qemu_qem_notrace_ld8u(ctx, t0, t0);
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    gen_helper_qem_dcache_flush_inval(cpu_env, t1, t2, t3, t4);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
     tcg_temp_free(t0);
 }
 
@@ -4467,6 +5029,23 @@ static void gen_dcbfep(DisasContext *ctx)
     t0 = tcg_temp_new();
     gen_addr_reg_index(ctx, t0);
     tcg_gen_qemu_ld_tl(t0, t0, PPC_TLB_EPID_LOAD, DEF_MEMOP(MO_UB));
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    gen_helper_qem_dcache_flush_inval(cpu_env, t1, t2, t3, t4);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
     tcg_temp_free(t0);
 }
 
@@ -4484,8 +5063,26 @@ static void gen_dcbi(DisasContext *ctx)
     gen_addr_reg_index(ctx, EA);
     val = tcg_temp_new();
     /* XXX: specification says this should be treated as a store by the MMU */
-    gen_qemu_ld8u(ctx, val, EA);
-    gen_qemu_st8(ctx, val, EA);
+    gen_qemu_qem_notrace_ld8u(ctx, val, EA);
+    gen_qemu_qem_notrace_st8(ctx, val, EA);
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    gen_helper_qem_dcache_inval(cpu_env, t1, t2, t3, t4);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
     tcg_temp_free(val);
     tcg_temp_free(EA);
 #endif /* defined(CONFIG_USER_ONLY) */
@@ -4499,7 +5096,43 @@ static void gen_dcbst(DisasContext *ctx)
     gen_set_access_type(ctx, ACCESS_CACHE);
     t0 = tcg_temp_new();
     gen_addr_reg_index(ctx, t0);
-    gen_qemu_ld8u(ctx, t0, t0);
+    gen_qemu_qem_notrace_ld8u(ctx, t0, t0);
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+#define MEM_E500
+/* On E500 DCBST act like  DCBF */
+#ifndef MEM_E500
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    TCGv_i32 t5 = tcg_const_i32(1);
+    gen_helper_qem_dcache_flush(cpu_env, t1, t2, t3, t4, t5);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+    tcg_temp_free_i32(t5);
+#else
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    gen_helper_qem_dcache_flush_inval(cpu_env, t1, t2, t3, t4);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+#endif /* MEM_E500 */
+#undef MEM_E500
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     tcg_temp_free(t0);
 }
 
@@ -4512,6 +5145,42 @@ static void gen_dcbstep(DisasContext *ctx)
     t0 = tcg_temp_new();
     gen_addr_reg_index(ctx, t0);
     tcg_gen_qemu_ld_tl(t0, t0, PPC_TLB_EPID_LOAD, DEF_MEMOP(MO_UB));
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+#define MEM_E500
+/* On E500 DCBST act like  DCBF */
+#ifndef MEM_E500
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    TCGv_i32 t5 = tcg_const_i32(1);
+    gen_helper_qem_dcache_flush(cpu_env, t1, t2, t3, t4, t5);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+    tcg_temp_free_i32(t5);
+#else
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    gen_helper_qem_dcache_flush_inval(cpu_env, t1, t2, t3, t4);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+#endif /* MEM_E500 */
+#undef MEM_E500
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     tcg_temp_free(t0);
 }
 
@@ -4522,6 +5191,25 @@ static void gen_dcbt(DisasContext *ctx)
     /* XXX: specification say this is treated as a load by the MMU
      *      but does not generate any exception
      */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    TCGv_i32 t5 = tcg_const_i32(0);
+    gen_helper_qem_dcache_prefetch_non_inibited(cpu_env, t1, t2, t3, t4, t5);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+    tcg_temp_free_i32(t5);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 }
 
 /* dcbtep */
@@ -4531,6 +5219,25 @@ static void gen_dcbtep(DisasContext *ctx)
     /* XXX: specification say this is treated as a load by the MMU
      *      but does not generate any exception
      */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    TCGv_i32 t5 = tcg_const_i32(0);
+    gen_helper_qem_dcache_prefetch_non_inibited(cpu_env, t1, t2, t3, t4, t5);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+    tcg_temp_free_i32(t5);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 }
 
 /* dcbtst */
@@ -4540,6 +5247,25 @@ static void gen_dcbtst(DisasContext *ctx)
     /* XXX: specification say this is treated as a load by the MMU
      *      but does not generate any exception
      */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    TCGv_i32 t5 = tcg_const_i32(1);
+    gen_helper_qem_dcache_prefetch_non_inibited(cpu_env, t1, t2, t3, t4, t5);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+    tcg_temp_free_i32(t5);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 }
 
 /* dcbtstep */
@@ -4549,6 +5275,25 @@ static void gen_dcbtstep(DisasContext *ctx)
     /* XXX: specification say this is treated as a load by the MMU
      *      but does not generate any exception
      */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    TCGv_i32 t5 = tcg_const_i32(1);
+    gen_helper_qem_dcache_prefetch_non_inibited(cpu_env, t1, t2, t3, t4, t5);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+    tcg_temp_free_i32(t5);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 }
 
 /* dcbtls */
@@ -4559,8 +5304,98 @@ static void gen_dcbtls(DisasContext *ctx)
     gen_load_spr(t0, SPR_Exxx_L1CSR0);
     tcg_gen_ori_tl(t0, t0, L1CSR0_CUL);
     gen_store_spr(SPR_Exxx_L1CSR0, t0);
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    TCGv_i32 t5 = tcg_const_i32(0);
+    gen_helper_qem_dcache_lock(cpu_env, t1, t2, t3, t4, t5);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+    tcg_temp_free_i32(t5);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     tcg_temp_free(t0);
 }
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+/* dcbtstls */
+static void gen_dcbtstls(DisasContext *ctx)
+{
+    TCGv_i32 t0 = tcg_const_i32(1);
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    gen_helper_qem_dcache_lock(cpu_env, t1, t2, t3, t4, t0);
+    tcg_temp_free_i32(t0);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+
+}
+
+/* dcblc */
+static void gen_dcblc(DisasContext *ctx)
+{
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    gen_helper_qem_dcache_unlock(cpu_env, t1, t2, t3, t4);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+}
+
+/* icbtls */
+static void gen_icbtls(DisasContext *ctx)
+{
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    TCGv_i32 t5 = tcg_const_i32(0);
+    gen_helper_qem_icache_lock(cpu_env, t1, t2, t3, t4, t5);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+    tcg_temp_free_i32(t5);
+}
+
+/* icblc */
+static void gen_icblc(DisasContext *ctx)
+{
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    gen_helper_qem_icache_unlock(cpu_env, t1, t2, t3, t4);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+}
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 
 /* dcbz */
 static void gen_dcbz(DisasContext *ctx)
@@ -4574,6 +5409,22 @@ static void gen_dcbz(DisasContext *ctx)
     gen_addr_reg_index(ctx, tcgv_addr);
     gen_helper_dcbz(cpu_env, tcgv_addr, tcgv_op);
     tcg_temp_free(tcgv_addr);
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    /* For our tracing we simply need to treat this as a write. We do not
+     * maintain memory values thanks to the trace so we just need to know if a
+     * block is to be invalidated in other caches on a write. We define the
+     * store size to 1 Byte to avoid unaligned cache line access.
+     */
+    gen_qem_dcbz_trace_trad(rA(ctx->opcode), rB(ctx->opcode), 1);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     tcg_temp_free_i32(tcgv_op);
 }
 
@@ -4589,6 +5440,22 @@ static void gen_dcbzep(DisasContext *ctx)
     gen_addr_reg_index(ctx, tcgv_addr);
     gen_helper_dcbzep(cpu_env, tcgv_addr, tcgv_op);
     tcg_temp_free(tcgv_addr);
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    /* For our tracing we simply need to treat this as a write. We do not
+     * maintain memory values thanks to the trace so we just need to know if a
+     * block is to be invalidated in other caches on a write. We define the
+     * store size to 1 Byte to avoid unaligned cache line access.
+     */
+    gen_qem_dcbz_trace_trad(rA(ctx->opcode), rB(ctx->opcode), 1);
+#endif /* QEM_TRACE_ENABLED */
+
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
     tcg_temp_free_i32(tcgv_op);
 }
 
@@ -4627,6 +5494,26 @@ static void gen_icbi(DisasContext *ctx)
     t0 = tcg_temp_new();
     gen_addr_reg_index(ctx, t0);
     gen_helper_icbi(cpu_env, t0);
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    gen_helper_qem_icache_inval(cpu_env, t1, t2, t3, t4);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+#endif /* QEM_TRACE_ENABLED */
+
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     tcg_temp_free(t0);
 }
 
@@ -4638,6 +5525,26 @@ static void gen_icbiep(DisasContext *ctx)
     t0 = tcg_temp_new();
     gen_addr_reg_index(ctx, t0);
     gen_helper_icbiep(cpu_env, t0);
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    gen_helper_qem_icache_inval(cpu_env, t1, t2, t3, t4);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+#endif /* QEM_TRACE_ENABLED */
+
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     tcg_temp_free(t0);
 }
 
@@ -4649,6 +5556,21 @@ static void gen_dcba(DisasContext *ctx)
     /* XXX: specification say this is treated as a store by the MMU
      *      but does not generate any exception
      */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    /* For our tracing we simply need to treat this as a write. We do not
+     * maintain memory values thanks to the trace so we just need to know if a
+     * block is to be invalidated in other caches on a write as it will be
+     * marked as modified). We define the store size to 1 Byte to avoid
+     * unaligned cache line access.
+     */
+    gen_qem_datast_trace_trad(rA(ctx->opcode), rB(ctx->opcode), 1);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 }
 
 /***                    Segment register manipulation                      ***/
@@ -5727,6 +6649,27 @@ static void gen_tlbli_74xx(DisasContext *ctx)
 static void gen_clf(DisasContext *ctx)
 {
     /* Cache line flush: implemented as no-op */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    /* We flush both instruction and data cache */
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    TCGv_i32 t5 = tcg_const_i32(0);
+    gen_helper_qem_dcache_flush(cpu_env, t1, t2, t3, t4, t5);
+    gen_helper_qem_icache_flush(cpu_env, t1, t2, t3, t4);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+    tcg_temp_free_i32(t5);
+#endif /* QNE_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 }
 
 /* cli */
@@ -5735,6 +6678,25 @@ static void gen_cli(DisasContext *ctx)
 #if defined(CONFIG_USER_ONLY)
     GEN_PRIV;
 #else
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    /* We invalidate both instruction and data cache */
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_LINE);
+    gen_helper_qem_dcache_inval(cpu_env, t1, t2, t3, t4);
+    gen_helper_qem_icache_inval(cpu_env, t1, t2, t3, t4);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+#endif /* QNE_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
     /* Cache line invalidate: privileged and treated as no-op */
     CHK_SV;
 #endif /* defined(CONFIG_USER_ONLY) */
@@ -5744,6 +6706,21 @@ static void gen_cli(DisasContext *ctx)
 static void gen_dclst(DisasContext *ctx)
 {
     /* Data cache line store: treated as no-op */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    /* For our tracing we simply need to treat this as a write. We do not
+     * maintain memory values thanks to the trace so we just need to know if a
+     * block is to be invalidated in other caches on a write as it will be
+     * marked as modified). We define the store size to 1 Byte to avoid
+     * unaligned cache line access.
+     */
+    gen_qem_datast_trace_trad(rA(ctx->opcode), rB(ctx->opcode), 1);
+#endif /* QNE_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 }
 
 static void gen_mfsri(DisasContext *ctx)
@@ -6143,6 +7120,21 @@ static void gen_icbt_40x(DisasContext *ctx)
     /* XXX: specification say this is treated as a load by the MMU
      *      but does not generate any exception
      */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+     TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+     TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+     TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+     gen_helper_qem_icbt(cpu_env, t1, t2, t3);
+     tcg_temp_free_i32(t1);
+     tcg_temp_free_i32(t2);
+     tcg_temp_free_i32(t3);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 }
 
 /* iccci */
@@ -6150,6 +7142,24 @@ static void gen_iccci(DisasContext *ctx)
 {
     CHK_SV;
     /* interpreted as no-op */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+    TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+    TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+    TCGv_i32 t4 = tcg_const_i32(QEM_TRACE_GRANULARITY_SET);
+    gen_helper_qem_dcache_inval(cpu_env, t1, t2, t3, t4);
+    gen_helper_qem_icache_inval(cpu_env, t1, t2, t3, t4);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+    tcg_temp_free_i32(t4);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 }
 
 /* icread */
@@ -6520,6 +7530,21 @@ static void gen_icbt_440(DisasContext *ctx)
     /* XXX: specification say this is treated as a load by the MMU
      *      but does not generate any exception
      */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+     TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
+     TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
+     TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
+     gen_helper_qem_icbt(cpu_env, t1, t2, t3);
+     tcg_temp_free_i32(t1);
+     tcg_temp_free_i32(t2);
+     tcg_temp_free_i32(t3);
+#endif
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 }
 
 /* Embedded.Processor Control */
@@ -6917,6 +7942,18 @@ GEN_HANDLER_E(dcbtep, 0x1F, 0x1F, 0x09, 0x00000001, PPC_NONE, PPC2_BOOKE206),
 GEN_HANDLER(dcbtst, 0x1F, 0x16, 0x07, 0x00000001, PPC_CACHE),
 GEN_HANDLER_E(dcbtstep, 0x1F, 0x1F, 0x07, 0x00000001, PPC_NONE, PPC2_BOOKE206),
 GEN_HANDLER_E(dcbtls, 0x1F, 0x06, 0x05, 0x02000001, PPC_BOOKE, PPC2_BOOKE206),
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+GEN_HANDLER_E(icblc, 0x1F, 0x06, 0x07, 0x02000001, PPC_BOOKE, PPC2_BOOKE206),
+GEN_HANDLER_E(icbtls, 0x1F, 0x06, 0x0F, 0x02000001, PPC_BOOKE, PPC2_BOOKE206),
+GEN_HANDLER_E(dcblc, 0x1F, 0x06, 0x0C, 0x02000001, PPC_BOOKE, PPC2_BOOKE206),
+GEN_HANDLER_E(dcbtstls, 0x1F, 0x06, 0x04, 0x02000001, PPC_BOOKE, PPC2_BOOKE206),
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 GEN_HANDLER(dcbz, 0x1F, 0x16, 0x1F, 0x03C00001, PPC_CACHE_DCBZ),
 GEN_HANDLER_E(dcbzep, 0x1F, 0x1F, 0x1F, 0x03C00001, PPC_NONE, PPC2_BOOKE206),
 GEN_HANDLER(dst, 0x1F, 0x16, 0x0A, 0x01800001, PPC_ALTIVEC),
@@ -7731,7 +8768,73 @@ static void ppc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
               ctx->opcode, opc1(ctx->opcode), opc2(ctx->opcode),
               opc3(ctx->opcode), opc4(ctx->opcode),
               ctx->le_mode ? "little" : "big");
+    
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+    /* We add a call to the trace helper */
+    gen_qem_instld_trace(ctx->base.pc_next, 4);
+
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     ctx->base.pc_next += 4;
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+    uint32_t custom_inst = 0;
+    /* Check if the instruction is a custom Qemu trace code */
+    /* Start tracing opcode */
+    if(ctx->opcode == QEM_TRACE_START_OP)
+    {
+        gen_helper_qem_start_trace(cpu_env);
+        custom_inst = 1;
+    }
+    /* Stop tracing opcode */
+    else if(ctx->opcode == QEM_TRACE_STOP_OP)
+    {
+        gen_helper_qem_stop_trace();
+        custom_inst = 1;
+    }
+    /* Start time point opcode */
+    else if(ctx->opcode == QEM_TRACE_START_TIMER_OP)
+    {
+        gen_helper_qem_trace_start_timer();
+        custom_inst = 1;
+    }
+    /* Get time point opcode */
+    else if(ctx->opcode == QEM_TRACE_GET_TIMER_OP)
+    {
+        gen_helper_qem_trace_get_timer();
+        custom_inst = 1;
+    }
+    /* Flash invalidate instruction cache opcode */
+    else if(ctx->opcode == QEM_TRACE_FLASH_INV_INST_OP)
+    {
+        gen_helper_qem_flash_inval_icache(cpu_env);
+        custom_inst = 1;
+    }
+    /* Flash invalidate data cache opcode */
+    else if(ctx->opcode == QEM_TRACE_FLASH_INV_DATA_OP)
+    {
+        gen_helper_qem_flash_inval_dcache(cpu_env);
+        custom_inst = 1;
+    }
+
+    if(custom_inst == 0)
+    {
+
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
     table = env->opcodes;
     handler = table[opc1(ctx->opcode)];
     if (is_indirect_opcode(handler)) {
@@ -7777,6 +8880,15 @@ static void ppc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
         }
     }
     (*(handler->handler))(ctx);
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    }
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 #if defined(DO_PPC_STATISTICS)
     handler->count++;
 #endif
