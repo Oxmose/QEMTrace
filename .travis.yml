@@ -4,32 +4,19 @@ dist: bionic
 
 addons:
     apt:
-        sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.9
         packages:
-            - g++-7
+            - g++
             - nasm
             - gcc-powerpc-linux-gnu
-            
-
 cache:
     directories:
-        - $HOME/Qemu
-
-env:
-    - TRAVIS_ARCH=386
-
+        - ./Qemu
 matrix:
   include:
     - compiler: gcc
       env: COMPILER=g++-7
 
 before_install:
-    - export ARCH=$TRAVIS_ARCH
     - if [ "$TRAVIS_OS_NAME" = "linux"  ]; then sudo apt-get -qq update;    fi
-
-before_script:
-    - if [ "$COMPILER" = "g++-7"        ]; then export CXX="g++-7" CC="gcc-7";              fi
 
 script: ./.build-travis.sh
