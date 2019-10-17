@@ -727,11 +727,13 @@ void helper_qem_icbt(CPUPPCState *env, int reg0, int reg1, int level)
 {
     if(qem_tracing_enabled == 1)
     {
+        
         /* ICBT acts like a load only on CT = 1 */
         if(level != 1)
         {
             return;
         }
+
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         target_ulong haddr;
@@ -739,6 +741,7 @@ void helper_qem_icbt(CPUPPCState *env, int reg0, int reg1, int level)
         int32_t cache_inhibit;
         int32_t wt_enable;
         uint32_t size = 1;
+
         ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);

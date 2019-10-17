@@ -7534,6 +7534,7 @@ static void gen_icbt_440(DisasContext *ctx)
  * QEMTrace START
  ******************************************************************************/
 #if QEM_TRACE_ENABLED
+
      TCGv_i32 t1 = tcg_const_i32(rA(ctx->opcode));
      TCGv_i32 t2 = tcg_const_i32(rB(ctx->opcode));
      TCGv_i32 t3 = tcg_const_i32(rS(ctx->opcode));
@@ -7541,7 +7542,7 @@ static void gen_icbt_440(DisasContext *ctx)
      tcg_temp_free_i32(t1);
      tcg_temp_free_i32(t2);
      tcg_temp_free_i32(t3);
-#endif
+#endif /* QEM_TRACE_ENABLED */
 /*******************************************************************************
  * QEMTrace END
  ******************************************************************************/
@@ -8059,7 +8060,7 @@ GEN_HANDLER(mfdcrux, 0x1F, 0x03, 0x09, 0x00000000, PPC_DCRUX),
 GEN_HANDLER(mtdcrux, 0x1F, 0x03, 0x0D, 0x00000000, PPC_DCRUX),
 GEN_HANDLER(dccci, 0x1F, 0x06, 0x0E, 0x03E00001, PPC_4xx_COMMON),
 GEN_HANDLER(dcread, 0x1F, 0x06, 0x0F, 0x00000001, PPC_4xx_COMMON),
-GEN_HANDLER2(icbt_40x, "icbt", 0x1F, 0x06, 0x08, 0x03E00001, PPC_40x_ICBT),
+GEN_HANDLER2(icbt_40x, "icbt", 0x1F, 0x06, 0x08, 0x02000001, PPC_40x_ICBT),
 GEN_HANDLER(iccci, 0x1F, 0x06, 0x1E, 0x00000001, PPC_4xx_COMMON),
 GEN_HANDLER(icread, 0x1F, 0x06, 0x1F, 0x03E00001, PPC_4xx_COMMON),
 GEN_HANDLER2(rfci_40x, "rfci", 0x13, 0x13, 0x01, 0x03FF8001, PPC_40x_EXCP),
@@ -8094,9 +8095,9 @@ GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
 GEN_HANDLER_E(mbar, 0x1F, 0x16, 0x1a, 0x001FF801,
               PPC_BOOKE, PPC2_BOOKE206),
 GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x03FFF801, PPC_BOOKE),
-GEN_HANDLER2_E(icbt_440, "icbt", 0x1F, 0x16, 0x00, 0x03E00001,
+GEN_HANDLER2_E(icbt_440, "icbt", 0x1F, 0x16, 0x00, 0x02000001,
                PPC_BOOKE, PPC2_BOOKE206),
-GEN_HANDLER2(icbt_440, "icbt", 0x1F, 0x06, 0x08, 0x03E00001,
+GEN_HANDLER2(icbt_440, "icbt", 0x1F, 0x06, 0x08, 0x02000001,
                PPC_440_SPEC),
 GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
 GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),

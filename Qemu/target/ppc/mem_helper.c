@@ -29,6 +29,15 @@
 
 //#define DEBUG_OP
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#include "../../QEMTrace/qem_trace_engine.h"
+#include "../../QEMTrace/qem_trace_config.h"
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
 static inline bool needs_byteswap(const CPUPPCState *env)
 {
 #if defined(TARGET_WORDS_BIGENDIAN)
@@ -62,6 +71,16 @@ void helper_lmw(CPUPPCState *env, target_ulong addr, uint32_t reg)
         } else {
             env->gpr[reg] = cpu_ldl_data_ra(env, addr, GETPC());
         }
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+        helper_qem_datald_trace_direct(env, addr, 4);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
         addr = addr_add(env, addr, 4);
     }
 }
@@ -75,6 +94,15 @@ void helper_stmw(CPUPPCState *env, target_ulong addr, uint32_t reg)
         } else {
             cpu_stl_data_ra(env, addr, (uint32_t)env->gpr[reg], GETPC());
         }
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+        helper_qem_datast_trace_direct(env, addr, 4);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
         addr = addr_add(env, addr, 4);
     }
 }
@@ -87,12 +115,30 @@ static void do_lsw(CPUPPCState *env, target_ulong addr, uint32_t nb,
     for (; nb > 3; nb -= 4) {
         env->gpr[reg] = cpu_ldl_data_ra(env, addr, raddr);
         reg = (reg + 1) % 32;
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+        helper_qem_datald_trace_direct(env, addr, 4);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
         addr = addr_add(env, addr, 4);
     }
     if (unlikely(nb > 0)) {
         env->gpr[reg] = 0;
         for (sh = 24; nb > 0; nb--, sh -= 8) {
             env->gpr[reg] |= cpu_ldub_data_ra(env, addr, raddr) << sh;
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+        helper_qem_datald_trace_direct(env, addr, 4);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
             addr = addr_add(env, addr, 1);
         }
     }
@@ -132,11 +178,29 @@ void helper_stsw(CPUPPCState *env, target_ulong addr, uint32_t nb,
     for (; nb > 3; nb -= 4) {
         cpu_stl_data_ra(env, addr, env->gpr[reg], GETPC());
         reg = (reg + 1) % 32;
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+        helper_qem_datast_trace_direct(env, addr, 4);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
         addr = addr_add(env, addr, 4);
     }
     if (unlikely(nb > 0)) {
         for (sh = 24; nb > 0; nb--, sh -= 8) {
             cpu_stb_data_ra(env, addr, (env->gpr[reg] >> sh) & 0xFF, GETPC());
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+        helper_qem_datast_trace_direct(env, addr, 4);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
             addr = addr_add(env, addr, 1);
         }
     }
