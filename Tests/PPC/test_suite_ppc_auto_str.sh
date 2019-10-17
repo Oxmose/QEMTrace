@@ -22,7 +22,7 @@ for entry in "./tests"/*.S
 do
     echo -n "Test: $entry "
 
-    {
+    # {
 
         rm -f ./mini_kernel/tests.S
         sync
@@ -103,7 +103,7 @@ do
 
         rm filtered_file newfile diff_file
 
-    } &> /dev/null
+    # } &> /dev/null
 
     if (( $val != 0 ))
     then
