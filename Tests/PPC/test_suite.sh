@@ -17,6 +17,7 @@ echo "Compiling..."
 sed -i 's/QEM_TRACE_PRINT 1/QEM_TRACE_PRINT 0/g' ../../QEMTrace/qem_trace_config.h
 
 # Compile qemu
+mkdir -p ../../Qemu/build
 cd ../../Qemu/build
 if [ $env_os = 2 ]
 then
