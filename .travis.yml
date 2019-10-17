@@ -15,7 +15,7 @@ addons:
 
 cache:
     directories:
-        - $HOME/qemu
+        - $HOME/Qemu
 
 env:
     - TRAVIS_ARCH=386
