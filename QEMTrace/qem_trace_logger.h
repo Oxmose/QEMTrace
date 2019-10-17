@@ -43,7 +43,7 @@
 
 /* Info message */
 #define QEM_TRACE_INFO(MSG, CODE){     \
-    printf("[QEMINFO] %s");            \
+    printf("[QEMINFO] %s", MSG);            \
     if(CODE != 0)                      \
     {                                  \
         printf(" | Code %d\n", CODE);  \
@@ -56,7 +56,7 @@
 
 /* Warning message */
 #define QEM_TRACE_WARNING(MSG, CODE){  \
-    printf("[QEMWARN] %s");            \
+    printf("[QEMWARN] %s", MSG);            \
     if(CODE != 0)                      \
     {                                  \
         printf(" | Code %d\n", CODE);  \
@@ -69,7 +69,7 @@
 
 /* Error message */
 #define QEM_TRACE_ERROR(MSG, CODE, CRITICAL){ \
-    printf("[QEMERROR] %s");                  \
+    printf("[QEMERROR] %s", MSG);                  \
     if(CODE != 0)                             \
     {                                         \
         printf(" | Code %d\n", CODE);         \
