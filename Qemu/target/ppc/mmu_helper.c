@@ -71,6 +71,23 @@ struct mmu_ctx_t {
     int nx;                        /* Non-execute area          */
 };
 
+int mmubooke_get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
+                                         target_ulong address, int rw,
+                                         int access_type);
+int check_physical(CPUPPCState *env, mmu_ctx_t *ctx,
+                                 target_ulong eaddr, int rw);
+int get_bat_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
+                           target_ulong virtual, int rw, int type);
+int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
+                                      target_ulong eaddr, int rw, int type); 
+int mmubooke206_check_tlb(CPUPPCState *env, ppcmas_tlb_t *tlb,
+                                 hwaddr *raddr, int *prot,
+                                 target_ulong address, int rw,
+                                 int access_type, int mmu_idx);
+int mmu40x_get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
+                                       target_ulong address, int rw,
+                                       int access_type);
+                                       
 /* Common routines used by software and hardware TLBs emulation */
 static inline int pte_is_valid(target_ulong pte0)
 {
@@ -393,7 +410,7 @@ static inline void bat_size_prot(CPUPPCState *env, target_ulong *blp,
     *protp = prot;
 }
 
-static int get_bat_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
+int get_bat_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
                            target_ulong virtual, int rw, int type)
 {
     target_ulong *BATlt, *BATut, *BATu, *BATl;
@@ -466,7 +483,7 @@ static int get_bat_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
 }
 
 /* Perform segment based translation */
-static inline int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
+int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
                                       target_ulong eaddr, int rw, int type)
 {
     PowerPCCPU *cpu = ppc_env_get_cpu(env);
@@ -670,7 +687,7 @@ static inline void ppc4xx_tlb_invalidate_all(CPUPPCState *env)
     tlb_flush(CPU(cpu));
 }
 
-static int mmu40x_get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
+int mmu40x_get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
                                        target_ulong address, int rw,
                                        int access_type)
 {
@@ -817,7 +834,7 @@ found_tlb:
     return ret;
 }
 
-static int mmubooke_get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
+int mmubooke_get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
                                          target_ulong address, int rw,
                                          int access_type)
 {
@@ -970,7 +987,7 @@ static bool mmubooke206_get_as(CPUPPCState *env,
 }
 
 /* Check if the tlb found by hashing really matches */
-static int mmubooke206_check_tlb(CPUPPCState *env, ppcmas_tlb_t *tlb,
+int mmubooke206_check_tlb(CPUPPCState *env, ppcmas_tlb_t *tlb,
                                  hwaddr *raddr, int *prot,
                                  target_ulong address, int rw,
                                  int access_type, int mmu_idx)
@@ -1354,7 +1371,7 @@ void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUPPCState *env)
     }
 }
 
-static inline int check_physical(CPUPPCState *env, mmu_ctx_t *ctx,
+int check_physical(CPUPPCState *env, mmu_ctx_t *ctx,
                                  target_ulong eaddr, int rw)
 {
     int in_plb, ret;

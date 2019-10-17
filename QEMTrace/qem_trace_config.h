@@ -5,7 +5,7 @@
  * proper set of tools.
  * 
  * Header included in
- *     accel/tcg/qem_trace_engine.h
+ *     qem_trace_engine.h
  *
  *  Copyright (c) 2019 Alexy Torres Aurora Dugo
  *

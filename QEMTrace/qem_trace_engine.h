@@ -91,10 +91,10 @@ void qem_trace_enable(CPUState* cs);
 void qem_trace_disable(void);
 
 /* Starts emulation time counter */
-void qem_trace_start_time(void);
+void qem_trace_start_timer(void);
 
 /* Returns the emulation time elapsed since the last start point */
-void qem_trace_output_time(void);
+void qem_trace_get_timer(void);
 
 
 /* Output a trace for a memory event. Depending on the options the
