@@ -22,6 +22,8 @@ extern void test_entry(void);
 
 static void bsp_init(void)
 {
+    uint32_t i;
+
     /* Map CCSRBAR */
     tlb_set_entry(1, 1, 1, 0, 0, BOOKE_PAGESZ_1M, CONFIG_SYS_CCSRBAR,
                   MAS2_I | MAS2_G, CONFIG_SYS_CCSRBAR_PHYS, MAS3_SW | MAS3_SR);
@@ -36,7 +38,7 @@ static void bsp_init(void)
         MAS3_SX | MAS3_SW | MAS3_SR);
 
     /* Map 1:1 pages at 0x3000 for test code for 16K */
-    for(uint32_t i = 0; i < 4; ++i)
+    for(i = 0; i < 4; ++i)
     {
         tlb_set_entry(0, 2 + i, 1, 0, 0, BOOKE_PAGESZ_4K, 0x3000 + i * 0x1000,
             MAS2_G, 0x3000 + i * 0x1000,
@@ -45,7 +47,7 @@ static void bsp_init(void)
     output_str("Test code mapped\n", SERIAL);
 
     /* Map 1:1 pages at 0x7000 for non coherent test data for 8K */
-    for(uint32_t i = 0; i < 2; ++i)
+    for(i = 0; i < 2; ++i)
     {
         tlb_set_entry(0, 6 + i, 1, 0, 0, BOOKE_PAGESZ_4K, 0x7000 + i * 0x1000,
             MAS2_G, 0x7000 + i * 0x1000,
@@ -54,7 +56,7 @@ static void bsp_init(void)
     output_str("Test 1:1 non coherent data mapped\n", SERIAL);
 
     /* Map 1:1 pages at 0x9000 for coherent test data for 8K */
-    for(uint32_t i = 0; i < 2; ++i)
+    for(i = 0; i < 2; ++i)
     {
         tlb_set_entry(0, 8 + i, 1, 0, 0, BOOKE_PAGESZ_4K, 0x9000 + i * 0x1000,
             MAS2_M | MAS2_G, 0x9000 + i * 0x1000,
@@ -63,7 +65,7 @@ static void bsp_init(void)
     output_str("Test 1:1 coherent data mapped\n", SERIAL);
 
     /* Map 1:-1 pages at 0xB000 for test data for 16K */
-    for(uint32_t i = 0; i < 4; ++i)
+    for(i = 0; i < 4; ++i)
     {
         tlb_set_entry(0, 6 + i, 1, 0, 0, BOOKE_PAGESZ_4K, 0xB000 + i * 0x1000,
             MAS2_G, 0xE000 - i * 0x1000,
