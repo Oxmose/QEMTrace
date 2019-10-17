@@ -150,7 +150,7 @@ static void qem_close_tracing(void)
     /* Close file */
     if(fclose(qem_trace_file_fd) < 0)
     {
-        QEM_TRACE_ERROR("Error while closing the trace output file", errno, 0);
+        QEM_TRACE_ERROR("Error while closing the trace file", errno, 0);
     }
     else
     {

@@ -48,7 +48,7 @@
  *****************************/
 
 /* Print trace to stdio (1) or output file(0) */
-#define QEM_TRACE_PRINT 1
+#define QEM_TRACE_PRINT 0
 
 /* Modify this value depending on the system you want to trace
  * 0 = 32 Bits target
