@@ -25,7 +25,7 @@ for entry in "./tests"/*.S
 do
     echo -n "Test: $entry "
 
-    {
+    # {
 
         rm -f ./mini_kernel/tests.S
         echo "#include \"ppc-asm.h\"" > ./mini_kernel/tests.S
@@ -121,7 +121,7 @@ do
 
         rm filtered_file newfile *.out
 
-    } &> /dev/null
+    # } &> /dev/null
 
     if (( $val != 0 ))
     then
