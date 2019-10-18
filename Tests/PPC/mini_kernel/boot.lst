@@ -1,4 +1,4 @@
-GAS LISTING /tmp/ccExAwFp.s 			page 1
+GAS LISTING /tmp/ccSiE04z.s 			page 1
 
 
    1              	# 1 "boot.S"
@@ -58,7 +58,7 @@ GAS LISTING /tmp/ccExAwFp.s 			page 1
   33              	#define r4	4
   34              	#define r5	5
   35              	#define r6	6
-GAS LISTING /tmp/ccExAwFp.s 			page 2
+GAS LISTING /tmp/ccSiE04z.s 			page 2
 
 
   36              	#define r7	7
@@ -118,7 +118,7 @@ GAS LISTING /tmp/ccExAwFp.s 			page 1
   90              	#define f19	19
   91              	#define f20	20
   92              	#define f21	21
-GAS LISTING /tmp/ccExAwFp.s 			page 3
+GAS LISTING /tmp/ccSiE04z.s 			page 3
 
 
   93              	#define f22	22
@@ -178,7 +178,7 @@ GAS LISTING /tmp/ccExAwFp.s 			page 1
  147              	#define v7	7
  148              	#define v8	8
  149              	#define v9	9
-GAS LISTING /tmp/ccExAwFp.s 			page 4
+GAS LISTING /tmp/ccSiE04z.s 			page 4
 
 
  150              	#define v10	10
@@ -238,7 +238,7 @@ GAS LISTING /tmp/ccExAwFp.s 			page 1
  204              	#define vs29	29
  205              	#define vs30	30
  206              	#define vs31	31
-GAS LISTING /tmp/ccExAwFp.s 			page 5
+GAS LISTING /tmp/ccSiE04z.s 			page 5
 
 
  207              	#define vs32	32
@@ -298,7 +298,7 @@ GAS LISTING /tmp/ccExAwFp.s 			page 1
  261              	/* Defining "toc" above breaks @toc in assembler code.  */
  262              	#undef toc
  263              	
-GAS LISTING /tmp/ccExAwFp.s 			page 6
+GAS LISTING /tmp/ccSiE04z.s 			page 6
 
 
  264              	#define FUNC_NAME(name) GLUE(__USER_LABEL_PREFIX__,name)
@@ -358,7 +358,7 @@ GAS LISTING /tmp/ccExAwFp.s 			page 1
  318              	name: \
  319              		.long GLUE(.,name); \
  320              		.long _GLOBAL_OFFSET_TABLE_; \
-GAS LISTING /tmp/ccExAwFp.s 			page 7
+GAS LISTING /tmp/ccSiE04z.s 			page 7
 
 
  321              		.long 0; \
@@ -418,7 +418,7 @@ GAS LISTING /tmp/ccExAwFp.s 			page 1
  375              	#endif
  376              	#endif
  377              	
-GAS LISTING /tmp/ccExAwFp.s 			page 8
+GAS LISTING /tmp/ccSiE04z.s 			page 8
 
 
  378              	#if defined __linux__
