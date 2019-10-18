@@ -12,7 +12,7 @@ fi
 echo -e "\e[94m============================= PPC  TEST AUTO: FULL =============================\e[39m"
 
 echo "Compiling..."
-{
+# {
 # Modify output to binary
 sed -i 's/QEM_TRACE_TYPE QEM_TRACE_PRINT/QEM_TRACE_TYPE QEM_TRACE_FILE/g' ../../QEMTrace/qem_trace_config.h
 sed -i 's/QEM_TRACE_TYPE QEM_TRACE_SMI/QEM_TRACE_TYPE QEM_TRACE_FILE/g' ../../QEMTrace/qem_trace_config.h
@@ -30,13 +30,13 @@ make
 
 # Launch test
 cd ../../Tests/PPC
-} &> /dev/null
+# } &> /dev/null
 
 ./test_suite_ppc_auto_bin.sh
 error=$?
 
 echo "Compiling..."
-{
+# {
 # Modify output to printf
 sed -i 's/QEM_TRACE_TYPE QEM_TRACE_FILE/QEM_TRACE_TYPE QEM_TRACE_PRINT/g' ../../QEMTrace/qem_trace_config.h
 
@@ -46,7 +46,7 @@ make
 
 # Launch test
 cd ../../Tests/PPC
-} &> /dev/null
+# } &> /dev/null
 
 ./test_suite_ppc_auto_str.sh
 error=$(($? + $error))
