@@ -1,7 +1,6 @@
 /*
  * Guest memory access tracing engine.
- *
- * Provides tools to translate virtual addresses to physical addreses.
+ * 
  * Provides tools to save traces in trace files.
  *
  *  Copyright (c) 2019 Alexy Torres Aurora Dugo
@@ -31,6 +30,8 @@
 
 #if QEM_TRACE_ENABLED
 
+#if QEM_TRACE_TYPE == QEM_TRACE_FILE
+
 #include "qem_trace_engine.h" /* Engine header */
 #include "qem_trace_logger.h" /* QEM logger */
 
@@ -43,10 +44,6 @@ volatile uint32_t qem_tracing_enabled = 0;
 /* Keeps track execution time */
 volatile uint64_t qem_time_start = 0;
 
-/* Commnuicator connection state */
-uint32_t connected = 0;
-
-#if QEM_TRACE_PRINT == 0
 /* This is used to implement the write buffer. This buffer contains the last
  * memory traces to be written back to the disk. Using the buffer allows to
  * avoid having to call "write" at avery tracing point and allow a nearly-null
@@ -62,12 +59,10 @@ static FILE*    qem_trace_file_fd;
  * xx is the file_index.
  */
 static uint32_t qem_file_index = 0;
-#endif /* #if QEM_TRACE_PRINT == 0 && QEM_TRACE_STREAM  */
 
 /*******************************************************************************
  * FUNCTIONS
  ******************************************************************************/
-#if QEM_TRACE_PRINT == 0
 static void qem_write_header(const uint64_t size, const uint32_t trace_size,
                              const uint32_t trace_version)
 {
@@ -157,7 +152,6 @@ static void qem_close_tracing(void)
         QEM_TRACE_INFO("Trace file saved", 0);
     }
 }
-#endif /* #if QEM_TRACE_PRINT == 0 */
 
 void qem_trace_enable(CPUState* cs)
 {
@@ -169,35 +163,8 @@ void qem_trace_enable(CPUState* cs)
     /* Enable tracing state */
     qem_tracing_enabled = 1;
 
-#if QEM_TRACE_PRINT == 0
     /* Open output file */
     qem_init_tracing();
-#endif
-
-#ifdef TARGET_I386
-    /* Flush software tlb */
-    CPUArchState *env = cs->env_ptr;
-
-    /* The QOM tests will trigger tlb_flushes without setting up TCG
-     * so we bug out here in that case.
-     */
-    if (!tcg_enabled()) 
-    {
-        QEM_TRACE_ERROR("Error while enabling traces", QEM_ERROR_TCG_DIS, 0);
-    }
-
-    atomic_set(&env->tlb_flush_count, env->tlb_flush_count + 1);
-
-    memset(env->tlb_table, -1, sizeof(env->tlb_table));
-    memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
-    cpu_tb_jmp_cache_clear(cs);
-
-    env->vtlb_index = 0;
-    env->tlb_flush_addr = -1;
-    env->tlb_flush_mask = 0;
-
-    atomic_mb_set(&cs->pending_tlb_flush, 0);
-#endif
 }
 
 void qem_trace_disable(void)
@@ -210,10 +177,8 @@ void qem_trace_disable(void)
     /* Enable tracing state */
     qem_tracing_enabled = 0;
 
-#if QEM_TRACE_PRINT == 0
     /* Close output file or stream */
     qem_close_tracing();
-#endif
 }
 
 void qem_trace_start_timer(void)
@@ -240,7 +205,6 @@ void qem_trace_output(uint32_t virt_addr, uint32_t phys_addr,
                       uint32_t core, uint64_t time, uint32_t flags)
 #endif
 {
-#if QEM_TRACE_PRINT == 0
     int error;
 
     (void)virt_addr;
@@ -277,63 +241,8 @@ void qem_trace_output(uint32_t virt_addr, uint32_t phys_addr,
      uint64_t offset = qem_trace_buffer_size * sizeof(qem_trace_t);
      memcpy(qem_trace_buffer + offset, &new_trace, sizeof(qem_trace_t));
      ++qem_trace_buffer_size;
-#else
-
-     ((flags & QEM_TRACE_EVENT_DCBZ) == QEM_TRACE_EVENT_DCBZ) ? printf("D ") : (
-         ((flags & QEM_TRACE_EVENT_PREFETCH) == QEM_TRACE_EVENT_PREFETCH) ? printf("P ") : (
-            ((flags & QEM_TRACE_EVENT_UNLOCK) == QEM_TRACE_EVENT_UNLOCK) ? printf("U ") : (
-                 ((flags & QEM_TRACE_EVENT_LOCK) == QEM_TRACE_EVENT_LOCK) ? printf("L ") : (
-                         ((flags & (QEM_TRACE_EVENT_INVALIDATE | QEM_TRACE_EVENT_FLUSH)) == (QEM_TRACE_EVENT_INVALIDATE | QEM_TRACE_EVENT_FLUSH)) ? printf("FL/INV ") : (
-                             ((flags & QEM_TRACE_EVENT_INVALIDATE) == QEM_TRACE_EVENT_INVALIDATE) ? printf("INV ") : (
-                                 ((flags & QEM_TRACE_EVENT_FLUSH) == QEM_TRACE_EVENT_FLUSH) ? printf("FL ") : ((flags & QEM_TRACE_DATA_TYPE_INST) ? printf("I "): printf("D "))))))));
-
-
-    if(flags & QEM_TRACE_ACCESS_TYPE_WRITE)
-    {
-        printf("ST ");
-    }
-    else
-    {
-        printf("LD ");
-    }
-
-    printf("| V 0x%08x | P 0x%08x | Core %d | Time %" PRIu64 " | RW: %c | ID: %c | PL: %c | E: %c | G: %c | S: %c | CR: %c | CL: %c | CI: %c | WT: %c | EX: %c\n",
-           virt_addr, phys_addr, core, time,
-           (flags & QEM_TRACE_ACCESS_TYPE_WRITE) ? 'W' : 'R',
-
-           (flags & QEM_TRACE_DATA_TYPE_INST) ? 'I' : 'D',
-
-           (flags & QEM_TRACE_PL_USER) ? 'U' : 'K',
-
-           ((flags & QEM_TRACE_EVENT_MASK) == QEM_TRACE_EVENT_DCBZ) ? 'D' : (
-               ((flags & QEM_TRACE_EVENT_MASK) == QEM_TRACE_EVENT_PREFETCH) ? 'P' : (
-                   ((flags & QEM_TRACE_EVENT_MASK) == QEM_TRACE_EVENT_UNLOCK) ? 'U' : (
-                        ((flags & QEM_TRACE_EVENT_MASK) == QEM_TRACE_EVENT_LOCK) ? 'L' : (
-                                ((flags & QEM_TRACE_EVENT_MASK) == (QEM_TRACE_EVENT_INVALIDATE | QEM_TRACE_EVENT_FLUSH)) ? 'B' : (
-                                    ((flags & QEM_TRACE_EVENT_MASK) == QEM_TRACE_EVENT_INVALIDATE) ? 'I' : (
-                                        ((flags & QEM_TRACE_EVENT_MASK) == QEM_TRACE_EVENT_FLUSH) ? 'F' : 'A')))))),
-
-           ((flags & QEM_TRACE_GRANULARITY_MASK) == QEM_TRACE_GRANULARITY_SET) ? 'S' :
-           ((flags & QEM_TRACE_GRANULARITY_MASK) == QEM_TRACE_GRANULARITY_WAY) ? 'W' :
-           ((flags & QEM_TRACE_GRANULARITY_MASK) == QEM_TRACE_GRANULARITY_GLOBAL) ? 'G' : 'L',
-
-           ((flags & QEM_TRACE_DATA_SIZE_MASK) == QEM_TRACE_DATA_SIZE_16_BITS) ? 'H' :
-           ((flags & QEM_TRACE_DATA_SIZE_MASK) == QEM_TRACE_DATA_SIZE_32_BITS) ? 'W' :
-           ((flags & QEM_TRACE_DATA_SIZE_MASK) == QEM_TRACE_DATA_SIZE_64_BITS) ? 'D' : 'B',
-
-           (flags & QEM_TRACE_COHERENCY_REQ) ? 'Y' : 'N',
-
-           ((flags & QEM_TRACE_CACHE_LEVEL_MASK) == QEM_TRACE_CACHE_LEVEL_ALL) ? 'A' :
-           ((flags & QEM_TRACE_CACHE_LEVEL_MASK) == QEM_TRACE_CACHE_LEVEL_3) ? '3' :
-           ((flags & QEM_TRACE_CACHE_LEVEL_MASK) == QEM_TRACE_CACHE_LEVEL_2) ? '2' : '1',
-
-           (flags & QEM_TRACE_CACHE_INHIBIT_ON) ? 'Y' : 'N',
-
-           (flags & QEM_TRACE_CACHE_WT_ON) ? 'E' : 'D',
-
-           (flags & QEM_TRACE_EVENT_EXCLUSIVE) ? 'Y' : 'N'
-       );
-#endif
 }
+
+#endif /* QEM_TRACE_TYPE == QEM_TRACE_FILE */
 
 #endif /* QEM_TRACE_ENABLED */

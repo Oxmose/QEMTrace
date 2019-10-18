@@ -8,7 +8,10 @@ obj-y += translator.o
 # QEMTrace START
 ###################################################
 
-obj-y += ../../../QEMTrace/qem_trace_engine.o
+obj-y += ../../../QEMTrace/qem_trace_print.o
+obj-y += ../../../QEMTrace/qem_trace_file.o
+obj-y += ../../../QEMTrace/qem_trace_smi.o
+obj-y += ../../../QEMTrace/qem_trace_smi_engine.o
 
 ###################################################
 # QEMTrace END

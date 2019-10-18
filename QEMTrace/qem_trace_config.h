@@ -46,9 +46,12 @@
 /******************************
  * Trace type 
  *****************************/
-
-/* Print trace to stdio (1) or output file(0) */
 #define QEM_TRACE_PRINT 0
+#define QEM_TRACE_FILE  1
+#define QEM_TRACE_SMI   2
+
+/* Select the trace type */
+#define QEM_TRACE_TYPE QEM_TRACE_PRINT
 
 /* Modify this value depending on the system you want to trace
  * 0 = 32 Bits target
@@ -74,8 +77,5 @@
 
 /* Size of the write buffer in number of entries */
 #define QEM_TRACE_BUFFER_SIZE 1024
-
-/* Stream buffer size in bytes */
-#define QEM_TRACE_STREAM_BUFFER_SIZE 65536
 
 #endif /* __QEM_TRACE_CONFIG_H_ */
