@@ -23,7 +23,7 @@ echo ""
 cd ../../SMILib
 make
 cd ../Tests/PPC
-gcc -std=c99 -O2 test_smi_client.c -L../../SMILib/lib -lpthread -lrt -lsmi -o smi_client
+gcc -std=c99 -O2 test_smi_client.c -L../../SMILib/lib -lpthread -lsmi -lrt -o smi_client
 
 if (( $? != 0 ))
 then
