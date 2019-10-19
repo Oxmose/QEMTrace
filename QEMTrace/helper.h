@@ -28,7 +28,6 @@
 
 #if QEM_TRACE_ENABLED
 
-
 #include "arch/ppc/helper.h"
 
 #endif /* QEM_TRACE_ENABLED */
