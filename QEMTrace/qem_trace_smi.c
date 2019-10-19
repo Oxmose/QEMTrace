@@ -59,7 +59,7 @@ static void qem_init_tracing(void)
     if(connected == 0)
     {
         qem_smi_client_init();
-        error = qem_smi_client_connect(1, 5);
+        error = qem_smi_client_connect(1, 1000);
         /* Connect the SMI */
         if(error != 0)
         {

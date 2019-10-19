@@ -11,11 +11,23 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
 fi
 
 echo ""
-echo -e "\e[94m============================ PPC  TEST AUTO: STRING ============================\e[39m"
+echo -e "\e[94m============================ PPC  TEST AUTO: SMI ============================\e[39m"
 echo ""
 test="_test.valid"
 
+echo ""
+echo -e "Compiling SMI client"
+echo ""
+# Compile SMI client
+gcc -std=c99 -O2 test_smi_client.c -L../../SMILib/lib -lpthread -lrt -lsmi -o smi_client
+if (( $? != 0 ))
+then
+    echo -e "\e[31mERROR Could not compile SMI client\e[39m"
+    exit 1
+fi
+
 error0=0
+
 
 # For paging enabled tests, concatenate all test files
 for entry in "./tests"/*.S
@@ -25,7 +37,6 @@ do
     {
 
         rm -f ./mini_kernel/tests.S
-        sync
         echo "#include \"ppc-asm.h\"" > ./mini_kernel/tests.S
 
         echo ".file	\"tests.S\"" >> ./mini_kernel/tests.S
@@ -54,18 +65,26 @@ do
         echo "mtlr r0" >> ./mini_kernel/tests.S
         echo "blr" >> ./mini_kernel/tests.S
 
+        sync
         cd mini_kernel
-        sync
-        # Make mini kernel
-        make && (make run > ../diff_file &)
 
-        sleep 2;
-        sync
+        rm *.out
+
+        # Make mini kernel
+        make && (make run &)
+        sleep 1;
+
+        # Run SMI client
+        ../smi_client > ../diff_file&
+
+        sleep 1;
         if [ $env_os = 2 ]
         then
             ps -W | awk '/qemu-system-ppc.exe/,NF=1' | xargs kill -f
+            ps -W | awk '/smi_client.exe/,NF=1' | xargs kill -f
         else
             killall qemu-system-ppc
+            killall smi_client
         fi
         sync
 
@@ -91,12 +110,13 @@ do
         fi
 
         sync
-        cut -d"|" -f1,2,3,4,6,7,8,9,10,11,12,13,14,15,16 "$entry$test" > newfile
-        cut -d"|" -f1,2,3,4,6,7,8,9,10,11,12,13,14,15,16 filtered_file > filtered_file_new
+        cut -d"|" -f1,3,4,6,7,8,9,10,11,12,13,14,15,16 "$entry$test" > newfile
+        cut -d"|" -f1,2,3,5,6,7,8,9,10,11,12,13,14,15 filtered_file > filtered_file_new
         sync
         sed -i 's/\s*$//' filtered_file_new
         sync
         mv filtered_file_new filtered_file
+
         sync
         diff newfile filtered_file >> /dev/null
         val=$?
@@ -116,9 +136,9 @@ done
 echo ""
 if (( $error0 != 0 ))
 then
-    echo -e "\e[31m------------------------- PPC  TEST AUTO STRING FAILED -------------------------\e[39m"
+    echo -e "\e[31m------------------------- PPC  TEST AUTO SMI FAILED -------------------------\e[39m"
 
 else
-    echo -e "\e[92m------------------------- PPC  TEST AUTO STRING PASSED -------------------------\e[39m"
+    echo -e "\e[92m------------------------- PPC  TEST AUTO SMI PASSED -------------------------\e[39m"
 fi
 exit $error0

@@ -51,7 +51,7 @@
 #define QEM_TRACE_SMI   2
 
 /* Select the trace type */
-#define QEM_TRACE_TYPE QEM_TRACE_PRINT
+#define QEM_TRACE_TYPE QEM_TRACE_SMI
 
 /* Modify this value depending on the system you want to trace
  * 0 = 32 Bits target
@@ -78,4 +78,7 @@
 /* Size of the write buffer in number of entries */
 #define QEM_TRACE_BUFFER_SIZE 1024
 
+/* SMI Settings */
+#define QEM_SMI_BLOCK_COUNT 8
+#define QEM_SMI_BLOCK_SIZE  1048576
 #endif /* __QEM_TRACE_CONFIG_H_ */
