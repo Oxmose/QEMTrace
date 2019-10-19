@@ -1,5 +1,9 @@
 #!/bin/bash
 
+cd Tests/PPC
+./test_suite_ppc_auto_smi.sh 
+exit 0
+
 error=0
 cd Tests
 for d in */ ; do

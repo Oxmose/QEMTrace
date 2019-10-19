@@ -18,13 +18,12 @@ test="_test.valid"
 echo ""
 echo -e "Compiling SMI client"
 echo ""
-{
+
 # Compile SMI client
 cd ../../SMILib
 make
 cd ../Tests/PPC
 gcc -std=c99 -O2 test_smi_client.c -L../../SMILib/lib -lpthread -lrt -lsmi -o smi_client
-} &> /dev/null
 
 if (( $? != 0 ))
 then
