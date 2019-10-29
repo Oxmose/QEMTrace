@@ -139,7 +139,7 @@ found_tlb:
     return ret;
 }
 
-static int ppc_get_info_addr_mem_trace_internal(CPUPPCState *env, mmu_ctx_t *ctx,
+static int qem_ppc_get_info_addr_mem_trace_internal(CPUPPCState *env, mmu_ctx_t *ctx,
                                    target_ulong eaddr, int rw,
                                    int access_type,
                                    int real_access_type,
@@ -212,7 +212,7 @@ static int ppc_get_info_addr_mem_trace_internal(CPUPPCState *env, mmu_ctx_t *ctx
     return ret;
 }
 
-void ppc_get_info_addr_mem_trace(CPUPPCState *env, vaddr addr,
+void qem_ppc_get_info_addr_mem_trace(CPUPPCState *env, vaddr addr,
                                    int real_access_type,
                                    target_ulong* phys_addr,
                                    int32_t* write_through_enabled,
@@ -224,7 +224,7 @@ void ppc_get_info_addr_mem_trace(CPUPPCState *env, vaddr addr,
     *coherency_enabled = -1;
     *phys_addr = -1;
 
-    if (unlikely(ppc_get_info_addr_mem_trace_internal(env, &ctx, addr, 0,
+    if (unlikely(qem_ppc_get_info_addr_mem_trace_internal(env, &ctx, addr, 0,
         ACCESS_INT, real_access_type, write_through_enabled,
         cache_inhibit, coherency_enabled) != 0)) {
 
@@ -232,7 +232,7 @@ void ppc_get_info_addr_mem_trace(CPUPPCState *env, vaddr addr,
          * ACCESS_INT, we may not be able to read instructions mapped by code
          * TLBs, so we also try a ACCESS_CODE.
          */
-        if (unlikely(ppc_get_info_addr_mem_trace_internal(env, &ctx, addr, 0,
+        if (unlikely(qem_ppc_get_info_addr_mem_trace_internal(env, &ctx, addr, 0,
                                   ACCESS_CODE, real_access_type,
                                   write_through_enabled,
                                   cache_inhibit, coherency_enabled) != 0)) {

@@ -70,7 +70,7 @@ struct mmu_ctx_t {
     int nx;                        /* Non-execute area          */
 };
 
-void ppc_get_info_addr_mem_trace(CPUPPCState *env, vaddr addr,
+void qem_ppc_get_info_addr_mem_trace(CPUPPCState *env, vaddr addr,
                                    int real_access_type,
                                    target_ulong* phys_addr,
                                    int32_t* write_through_enabled,
