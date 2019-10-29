@@ -54,6 +54,7 @@
 #else
 #define CPU_MMU_INDEX (cpu_mmu_index_kernel(env))
 #define MEMSUFFIX _kernel
+#define QEM_TRACE_CPULD
 #define DATA_SIZE 1
 #include "exec/cpu_ldst_template.h"
 
@@ -65,6 +66,7 @@
 
 #define DATA_SIZE 8
 #include "exec/cpu_ldst_template.h"
+#undef QEM_TRACE_CPULD
 #undef CPU_MMU_INDEX
 #undef MEMSUFFIX
 #endif

@@ -20,3 +20,14 @@ obj-$(CONFIG_WHPX) += whpx-all.o
 endif
 obj-$(CONFIG_SEV) += sev.o
 obj-$(call lnot,$(CONFIG_SEV)) += sev-stub.o
+
+###################################################
+# QEMTrace START
+###################################################
+
+obj-y += ../../../QEMTrace/arch/i386/qem_trace_engine.o
+obj-y += ../../../QEMTrace/arch/i386/helper.o
+
+###################################################
+# QEMTrace END
+###################################################

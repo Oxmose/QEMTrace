@@ -28,6 +28,11 @@
 
 #if QEM_TRACE_ENABLED
 
+#if defined(TARGET_PPC)
 #include "arch/ppc/helper.h"
+#endif
 
+#if defined(TARGET_X86_64) || defined(TARGET_I386)
+#include "arch/i386/helper.h"
+#endif
 #endif /* QEM_TRACE_ENABLED */

@@ -231,6 +231,34 @@ static const uint8_t cc_op_live[CC_OP_NB] = {
     [CC_OP_POPCNT] = USES_CC_SRC,
 };
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+static void gen_qem_instld_trace(DisasContext *s, target_ulong cur_eip, int size)
+{
+    TCGv t0 = tcg_const_tl(cur_eip);
+    TCGv_i32 t1 = tcg_const_i32(size);
+    /* Call the trace helper */
+    gen_helper_qem_instld_trace(cpu_env, t0, t1);
+    tcg_temp_free(t0);
+    tcg_temp_free_i32(t1);
+}
+
+/**************************************** LOAD ********************************/
+
+
+
+/*************************************** STORE ********************************/
+
+
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
+
 static void set_cc_op(DisasContext *s, CCOp op)
 {
     int dead;
@@ -426,11 +454,33 @@ static inline void gen_op_add_reg_T0(DisasContext *s, TCGMemOp size, int reg)
 static inline void gen_op_ld_v(DisasContext *s, int idx, TCGv t0, TCGv a0)
 {
     tcg_gen_qemu_ld_tl(t0, a0, s->mem_index, idx | MO_LE);
+/*******************************************************************************
+ * QEMTrace START 
+ ******************************************************************************/ 
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(idx & MO_SIZE);
+    gen_helper_qem_datald_trace(cpu_env, a0, t1);
+    tcg_temp_free_i32(t1);
+#endif /* QEM_TRACE_ENABLED */
+/******************************************************************************* 
+ * QEMTrace END 
+ ******************************************************************************/ 
 }
 
 static inline void gen_op_st_v(DisasContext *s, int idx, TCGv t0, TCGv a0)
 {
     tcg_gen_qemu_st_tl(t0, a0, s->mem_index, idx | MO_LE);
+/*******************************************************************************
+ * QEMTrace START 
+ ******************************************************************************/ 
+#if QEM_TRACE_ENABLED
+    TCGv_i32 t1 = tcg_const_i32(idx & MO_SIZE);
+    gen_helper_qem_datast_trace(cpu_env, a0, t1);
+    tcg_temp_free_i32(t1);
+#endif /* QEM_TRACE_ENABLED */
+/******************************************************************************* 
+ * QEMTrace END 
+ ******************************************************************************/ 
 }
 
 static inline void gen_op_st_rm_T0_A0(DisasContext *s, int idx, int d)
@@ -4504,6 +4554,17 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
         return s->pc;
     }
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+
+    /* We add a call to the trace helper */
+    gen_qem_instld_trace(s, pc_start, next_eip - pc_start);
+
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     prefixes = 0;
     rex_w = -1;
     rex_r = 0;
@@ -4655,6 +4716,37 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
         /* extended op code */
         b = x86_ldub_code(env, s) | 0x100;
         goto reswitch;
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+    case 0x1A6: /* Start mem tracing custom instruction */
+        /* Consume next two bytes */
+        b = x86_ldub_code(env, s);
+        b = x86_ldub_code(env, s);
+        gen_helper_qem_start_trace(cpu_env);
+        break;
+    case 0x1A7: /* Stop mem tracing custom instruction */
+        /* Consume next two bytes */
+        b = x86_ldub_code(env, s);
+        b = x86_ldub_code(env, s);
+        gen_helper_qem_stop_trace();
+        break;
+    case 0x17A: /* Start counter custom instruction */
+        /* Consume next two bytes */
+        b = x86_ldub_code(env, s);
+        b = x86_ldub_code(env, s);
+        gen_helper_qem_trace_start_timer();
+        break;
+    case 0x17B: /* Stop counter custom instruction */
+        /* Consume next two bytes */
+        b = x86_ldub_code(env, s);
+        b = x86_ldub_code(env, s);
+        gen_helper_qem_trace_get_timer();
+        break;
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 
         /**************************/
         /* arith & logic */
