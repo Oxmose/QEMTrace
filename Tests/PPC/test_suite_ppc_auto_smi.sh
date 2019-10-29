@@ -15,6 +15,9 @@ echo -e "\e[94m============================ PPC  TEST AUTO: SMI ================
 echo ""
 test="_test.valid"
 
+# Compile converter tool
+g++ -mno-ms-bitfields ../bin_to_str.cpp -o ../bin_to_str.bin
+
 echo ""
 echo -e "Compiling SMI client"
 echo ""
