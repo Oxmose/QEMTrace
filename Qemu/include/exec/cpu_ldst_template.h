@@ -93,6 +93,26 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
         trace_mem_build_info(SHIFT, false, MO_TE, false));
 #endif
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#ifdef QEM_TRACE_CPULD
+#if QEM_TRACE_ENABLED
+#if DATA_SIZE == 1
+    helper_qem_datald_trace(env, ptr, 0);
+#elif DATA_SIZE == 2
+    helper_qem_datald_trace(env, ptr, 1);
+#elif DATA_SIZE == 4
+    helper_qem_datald_trace(env, ptr, 2);
+#elif DATA_SIZE == 8
+    helper_qem_datald_trace(env, ptr, 3);
+#endif /* DATA_SIZE */
+#endif /* QEM_TRACE_ENABLED */
+#endif /* QEM_TRACE_CPULD */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     addr = ptr;
     mmu_idx = CPU_MMU_INDEX;
     entry = tlb_entry(env, mmu_idx, addr);
@@ -131,6 +151,23 @@ glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
         ENV_GET_CPU(env), ptr,
         trace_mem_build_info(SHIFT, true, MO_TE, false));
 #endif
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+#ifdef QEM_TRACE_CPULD
+
+#if DATA_SIZE == 1
+    helper_qem_datald_trace(env, ptr, 0);
+#elif DATA_SIZE == 2
+    helper_qem_datald_trace(env, ptr, 1);
+#endif /* DATA_SIZE */
+#endif /* QEM_TRACE_CPULD */
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 
     addr = ptr;
     mmu_idx = CPU_MMU_INDEX;
@@ -173,6 +210,26 @@ glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
         ENV_GET_CPU(env), ptr,
         trace_mem_build_info(SHIFT, false, MO_TE, true));
 #endif
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#ifdef QEM_TRACE_CPULD
+#if QEM_TRACE_ENABLED
+#if DATA_SIZE == 1
+    helper_qem_datast_trace(env, ptr, 0);
+#elif DATA_SIZE == 2
+    helper_qem_datast_trace(env, ptr, 1);
+#elif DATA_SIZE == 4
+    helper_qem_datast_trace(env, ptr, 2);
+#elif DATA_SIZE == 8
+    helper_qem_datast_trace(env, ptr, 3);
+#endif /* DATA_SIZE */
+#endif /* QEM_TRACE_ENABLED */
+#endif /* QEM_TRACE_CPULD */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 
     addr = ptr;
     mmu_idx = CPU_MMU_INDEX;

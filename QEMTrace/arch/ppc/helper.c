@@ -85,7 +85,7 @@ void helper_qem_instld_trace(CPUPPCState *env, target_ulong current_eip,
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, current_eip, ACCESS_CODE, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, current_eip, ACCESS_CODE, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -116,7 +116,7 @@ void helper_qem_datast_trace_direct(CPUPPCState *env, target_ulong virt_addr,
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -146,7 +146,7 @@ void helper_qem_datald_trace_direct(CPUPPCState *env, target_ulong virt_addr,
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -244,7 +244,7 @@ void helper_qem_dcache_flush_inval(CPUPPCState *env, int reg0, int reg1, int lev
         int32_t cache_inhibit;
         uint32_t size = 1;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -293,7 +293,7 @@ void helper_qem_dcache_inval(CPUPPCState *env, int reg0, int reg1, int level,
         int32_t cache_inhibit;
         uint32_t size = 1;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -342,7 +342,7 @@ void helper_qem_dcache_flush(CPUPPCState *env, int reg0, int reg1, int level,
         int32_t cache_inhibit;
         uint32_t size = 1;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -396,7 +396,7 @@ void helper_qem_dcache_prefetch_non_inibited(CPUPPCState *env, int reg0, int reg
         int32_t cache_inhibit;
         int32_t wt_enable;
         uint32_t size = 1;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -433,7 +433,7 @@ void helper_qem_dcache_lock(CPUPPCState *env, int reg0, int reg1, int level,
         int32_t cache_inhibit;
         uint32_t size = 1;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -485,7 +485,7 @@ void helper_qem_dcache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
         int32_t cache_inhibit;
         uint32_t size = 1;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -534,7 +534,7 @@ void helper_qem_icache_inval(CPUPPCState *env, int reg0, int reg1, int level,
         int32_t cache_inhibit;
         uint32_t size = 1;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -583,7 +583,7 @@ void helper_qem_icache_flush(CPUPPCState *env, int reg0, int reg1, int level,
         int32_t cache_inhibit;
         uint32_t size = 1;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -632,7 +632,7 @@ void helper_qem_icache_lock(CPUPPCState *env, int reg0, int reg1, int level,
         int32_t cache_inhibit;
         uint32_t size = 1;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -687,7 +687,7 @@ void helper_qem_icache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
         int32_t cache_inhibit;
         uint32_t size = 1;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -742,7 +742,7 @@ void helper_qem_icbt(CPUPPCState *env, int reg0, int reg1, int level)
         int32_t wt_enable;
         uint32_t size = 1;
 
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
@@ -773,7 +773,7 @@ void helper_qem_dcbz_trace_trad(CPUPPCState *env, int reg0, int reg1, int size)
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         int32_t wt_enable;
-        ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
