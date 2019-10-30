@@ -54,7 +54,18 @@
 #else
 #define CPU_MMU_INDEX (cpu_mmu_index_kernel(env))
 #define MEMSUFFIX _kernel
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#include "../../../QEMTrace/qem_trace_config.h"
+#if QEM_TRACE_ENABLED
 #define QEM_TRACE_CPULD
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
 #define DATA_SIZE 1
 #include "exec/cpu_ldst_template.h"
 
@@ -66,7 +77,17 @@
 
 #define DATA_SIZE 8
 #include "exec/cpu_ldst_template.h"
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
 #undef QEM_TRACE_CPULD
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
 #undef CPU_MMU_INDEX
 #undef MEMSUFFIX
 #endif

@@ -30,6 +30,14 @@
 
 #include "trace/mem.h"
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#include "../../../QEMTrace/qem_trace_config.h"
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
 #if DATA_SIZE == 8
 #define SUFFIX q
 #define USUFFIX q
@@ -96,8 +104,8 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
 /*******************************************************************************
  * QEMTrace START
  ******************************************************************************/
-#ifdef QEM_TRACE_CPULD
 #if QEM_TRACE_ENABLED
+#ifdef QEM_TRACE_CPULD
 #if DATA_SIZE == 1
     helper_qem_datald_trace(env, ptr, 0);
 #elif DATA_SIZE == 2
@@ -107,8 +115,8 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
 #elif DATA_SIZE == 8
     helper_qem_datald_trace(env, ptr, 3);
 #endif /* DATA_SIZE */
-#endif /* QEM_TRACE_ENABLED */
 #endif /* QEM_TRACE_CPULD */
+#endif /* QEM_TRACE_ENABLED */
 /*******************************************************************************
  * QEMTrace END
  ******************************************************************************/
@@ -157,7 +165,6 @@ glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
  ******************************************************************************/
 #if QEM_TRACE_ENABLED
 #ifdef QEM_TRACE_CPULD
-
 #if DATA_SIZE == 1
     helper_qem_datald_trace(env, ptr, 0);
 #elif DATA_SIZE == 2
@@ -214,8 +221,8 @@ glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
 /*******************************************************************************
  * QEMTrace START
  ******************************************************************************/
-#ifdef QEM_TRACE_CPULD
 #if QEM_TRACE_ENABLED
+#ifdef QEM_TRACE_CPULD
 #if DATA_SIZE == 1
     helper_qem_datast_trace(env, ptr, 0);
 #elif DATA_SIZE == 2
@@ -225,8 +232,8 @@ glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
 #elif DATA_SIZE == 8
     helper_qem_datast_trace(env, ptr, 3);
 #endif /* DATA_SIZE */
-#endif /* QEM_TRACE_ENABLED */
 #endif /* QEM_TRACE_CPULD */
+#endif /* QEM_TRACE_ENABLED */
 /*******************************************************************************
  * QEMTrace END
  ******************************************************************************/

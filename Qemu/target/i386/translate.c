@@ -4557,10 +4557,10 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
 /*******************************************************************************
  * QEMTrace START
  ******************************************************************************/
-
-    /* We add a call to the trace helper */
-    gen_qem_instld_trace(s, pc_start, next_eip - pc_start);
-
+#if QEM_TRACE_ENABLED
+    /* We add a call to the trace helper TODO: Add instruction size */
+    gen_qem_instld_trace(s, pc_start, 0);
+#endif /* QEM_TRACE_ENABLED */
 /*******************************************************************************
  * QEMTrace END
  ******************************************************************************/
@@ -4720,6 +4720,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
 /*******************************************************************************
  * QEMTrace START
  ******************************************************************************/
+#if QEM_TRACE_ENABLED
     case 0x1A6: /* Start mem tracing custom instruction */
         /* Consume next two bytes */
         b = x86_ldub_code(env, s);
@@ -4744,6 +4745,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
         b = x86_ldub_code(env, s);
         gen_helper_qem_trace_get_timer();
         break;
+#endif /* QEM_TRACE_ENABLED */
 /*******************************************************************************
  * QEMTrace END
  ******************************************************************************/
