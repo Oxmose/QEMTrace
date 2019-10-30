@@ -135,6 +135,7 @@ typedef struct mem_trace_header
 
 int main(int argc, char** argv)
 {
+    uint64_t lasttime = 0;
     int size = -1;
     if(argc != 3)
     {
@@ -199,6 +200,13 @@ int main(int argc, char** argv)
                 printf("LD ");
             }
 
+            if(lasttime > w_buf.timestamp)
+            {
+                printf("ERROR WRONG TIMESTAMP\n");
+                exit(-1);
+            }
+            lasttime = w_buf.timestamp;
+
             printf("| P 0x%08x | Core %d | Time %llu | RW: %c | ID: %c | PL: %c | E: %c | G: %c | S: %c | CR: %c | CL: %c | CI: %c | WT: %c | EX: %c\n",
                     w_buf.address, w_buf.flags & 0xFF, w_buf.timestamp,
                    (w_buf.flags & MEM_TRACE_ACCESS_TYPE_WRITE) ? 'W' : 'R',
@@ -256,9 +264,16 @@ int main(int argc, char** argv)
             {
                 printf("LD ");
             }
+            
+            if(lasttime > l_buf.timestamp)
+            {
+                printf("ERROR WRONG TIMESTAMP\n");
+                exit(-1);
+            }
+            lasttime = l_buf.timestamp;
 
             printf("| P 0x%16x | Core %d | Time %llu | RW: %c | ID: %c | PL: %c | E: %c | G: %c | S: %c | CR: %c | CL: %c | CI: %c | WT: %c | EX: %c\n",
-                    w_buf.address, w_buf.flags & 0xFF, w_buf.timestamp,
+                    l_buf.address, l_buf.flags & 0xFF, l_buf.timestamp,
                    (l_buf.flags & MEM_TRACE_ACCESS_TYPE_WRITE) ? 'W' : 'R',
 
                    (l_buf.flags & MEM_TRACE_DATA_TYPE_INST) ? 'I' : 'D',
