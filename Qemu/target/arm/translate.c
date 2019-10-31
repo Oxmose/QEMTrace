@@ -37,6 +37,15 @@
 #include "trace-tcg.h"
 #include "exec/log.h"
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#include "../../QEMTrace/qem_trace_engine.h"
+#include "../../QEMTrace/qem_trace_config.h"
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
 
 #define ENABLE_ARCH_4T    arm_dc_feature(s, ARM_FEATURE_V4T)
 #define ENABLE_ARCH_5     arm_dc_feature(s, ARM_FEATURE_V5)
@@ -79,6 +88,22 @@ static const char * const regnames[] =
 /* Function prototypes for gen_ functions calling Neon helpers.  */
 typedef void NeonGenThreeOpEnvFn(TCGv_i32, TCGv_env, TCGv_i32,
                                  TCGv_i32, TCGv_i32);
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+static void gen_qem_instld_trace(const target_ulong cur_eip, const int size)
+{
+    /* Call the trace helper */
+    TCGv t0 = tcg_const_tl(cur_eip);
+    TCGv_i32 t1 = tcg_const_i32(size);
+    gen_helper_qem_instld_trace(cpu_env, t0, t1);
+    tcg_temp_free(t0);
+    tcg_temp_free_i32(t1);
+}
+#endif /* QEM_TRACE_ENABLED */
+/*************************************** STORE ********************************/
 
 /* initialize TCG globals.  */
 void arm_translate_init(void)
@@ -8975,6 +9000,45 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
     TCGv_i32 addr;
     TCGv_i64 tmp64;
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+    /* We add a call to the trace helper */
+    //gen_qem_instld_trace(s->pc, 4);
+
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+    /* Check if the instruction is a custom Qemu trace code */
+    /* Start tracing opcode */
+    if(insn == QEM_TRACE_START_OP)
+    {
+        //gen_helper_qem_start_trace(cpu_env);
+        printf("START\n");
+        return;
+    }
+    /* Stop tracing opcode */
+    else if(insn == QEM_TRACE_STOP_OP)
+    {
+        //gen_helper_qem_stop_trace();
+        printf("STOP\n");
+        return;
+    }
+    
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     /* M variants do not implement ARM mode; this must raise the INVSTATE
      * UsageFault exception.
      */
@@ -8983,6 +9047,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
                            default_exception_el(s));
         return;
     }
+
     cond = insn >> 28;
     if (cond == 0xf){
         /* In ARMv3 and v4 the NV condition is UNPREDICTABLE; we
