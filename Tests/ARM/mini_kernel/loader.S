@@ -61,10 +61,10 @@ init:
     bl init_regs
 
     @ Clear screen
-    bl serial_clear_screen
+    @bl serial_clear_screen
 
     @ Init serial for debug
-    bl serial_clear_screen
+    @bl serial_clear_screen
 
     @ Setup interrupt vector
     bl int_vector_init

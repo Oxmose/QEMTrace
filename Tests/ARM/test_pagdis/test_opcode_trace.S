@@ -1,11 +1,11 @@
-; test_opcode_trace.asm
-;
-; Author  Alexy Torres Aurora Dugo
-; Version 1.0
-;
-; MiniKernel test: Start tracing Qemu custom instruction
-; The Qemu emulator should manage this instruction and strart
-; tracing the system memory access.
+@ test_opcode_trace.asm
+@
+@ Author  Alexy Torres Aurora Dugo
+@ Version 1.0
+@
+@ MiniKernel test: Start tracing Qemu custom instruction
+@ The Qemu emulator should manage this instruction and strart
+@ tracing the system memory access.
 
 @ Save registers
 push {r0, r1}
