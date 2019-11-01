@@ -93,17 +93,48 @@ typedef void NeonGenThreeOpEnvFn(TCGv_i32, TCGv_env, TCGv_i32,
  * QEMTrace START
  ******************************************************************************/
 #if QEM_TRACE_ENABLED
-static void gen_qem_instld_trace(const target_ulong cur_eip, const int size)
+static void gen_qem_instld_trace(const target_ulong cur_eip, const int size, int mmu_idx)
 {
     /* Call the trace helper */
     TCGv t0 = tcg_const_tl(cur_eip);
     TCGv_i32 t1 = tcg_const_i32(size);
-    gen_helper_qem_instld_trace(cpu_env, t0, t1);
+    TCGv_i32 t2 = tcg_const_i32(mmu_idx);
+    gen_helper_qem_instld_trace(cpu_env, t0, t1, t2);
     tcg_temp_free(t0);
     tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
 }
-#endif /* QEM_TRACE_ENABLED */
+
+/**************************************** LOAD ********************************/
+
+static void gen_qem_datald_trace(const TCGv addr,
+                                 const int size, int mmu_idx)
+{
+    /* Call the trace helper */
+    TCGv_i32 t1 = tcg_const_i32(size);
+    TCGv_i32 t2 = tcg_const_i32(mmu_idx);
+    gen_helper_qem_datald_trace(cpu_env, addr, t1, t2);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+}
+
 /*************************************** STORE ********************************/
+
+static void gen_qem_datast_trace(const TCGv addr,
+                                 const int size, int mmu_idx)
+{
+    /* Call the trace helper */
+    TCGv_i32 t1 = tcg_const_i32(size);
+    TCGv_i32 t2 = tcg_const_i32(mmu_idx);
+    gen_helper_qem_datast_trace(cpu_env, addr, t1, t2);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+}
+
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 
 /* initialize TCG globals.  */
 void arm_translate_init(void)
@@ -1150,6 +1181,18 @@ static void gen_aa32_ld_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
     }
 
     addr = gen_aa32_addr(s, a32, opc);
+
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    gen_qem_datald_trace(addr, (int)opc & MO_SIZE, s->mmu_idx);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     tcg_gen_qemu_ld_i32(val, addr, index, opc);
     tcg_temp_free(addr);
 }
@@ -1165,6 +1208,18 @@ static void gen_aa32_st_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
     }
 
     addr = gen_aa32_addr(s, a32, opc);
+
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    gen_qem_datast_trace(addr, (int)opc & MO_SIZE, s->mmu_idx);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     tcg_gen_qemu_st_i32(val, addr, index, opc);
     tcg_temp_free(addr);
 }
@@ -9005,32 +9060,17 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
  ******************************************************************************/
 #if QEM_TRACE_ENABLED
 
-    /* We add a call to the trace helper */
-    //gen_qem_instld_trace(s->pc, 4);
-
-#endif /* QEM_TRACE_ENABLED */
-/*******************************************************************************
- * QEMTrace END
- ******************************************************************************/
-
-/*******************************************************************************
- * QEMTrace START
- ******************************************************************************/
-#if QEM_TRACE_ENABLED
-
     /* Check if the instruction is a custom Qemu trace code */
     /* Start tracing opcode */
     if(insn == QEM_TRACE_START_OP)
     {
-        //gen_helper_qem_start_trace(cpu_env);
-        printf("START\n");
+        gen_helper_qem_start_trace(cpu_env);
         return;
     }
     /* Stop tracing opcode */
     else if(insn == QEM_TRACE_STOP_OP)
     {
-        //gen_helper_qem_stop_trace();
-        printf("STOP\n");
+        gen_helper_qem_stop_trace();
         return;
     }
     
@@ -13299,6 +13339,20 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
     }
 
     insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+
+    /* We add a call to the trace helper */
+    gen_qem_instld_trace(dc->pc, MO_32, dc->mmu_idx);
+
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
     dc->insn = insn;
     dc->pc += 4;
     disas_arm_insn(dc, insn);

@@ -18,7 +18,7 @@ CFLAGS = -std=c11 -nostdinc -fno-builtin -nostdlib -fno-stack-protector \
 ASFLAGS = -march=armv7-a -mcpu=cortex-a15
 LDFLAGS = -e loader -T linker.ld
 QEMUOPTS = -rtc base=localtime -m 64M -gdb tcp::1234 -serial stdio\
-		   -M vexpress-a15 -cpu cortex-a15 -smp 4 -kernel 
+		   -M vexpress-a15 -cpu cortex-a15 -kernel 
 
 
 # Build system image
