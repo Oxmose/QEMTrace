@@ -11,7 +11,8 @@
 push {r0, r1}
 
 @ Compute address at 1M 
-mov r0, #0x100000
+mov r0, #0x8020
+lsl r0, r0, #16
 mov r1, #0xDEAD
 
 @ Disable tracing: 0xFFFFFFF1 
@@ -25,7 +26,8 @@ str r1, [r0, #8]
 .long 0xFFFFFFF0
 
 @ Compute address at 1M 
-mov r0, #0x100000
+mov r0, #0x8020
+lsl r0, r0, #16
 mov r1, #0xDEAD
 
 str r1, [r0, #0]

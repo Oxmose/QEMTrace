@@ -99,7 +99,7 @@ void helper_qem_instld_trace(CPUARMState *env, target_ulong current_eip,
 
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size, access_mode);
-                      
+     
         qem_trace_output(current_eip,
                          hwaddr,
                          ENV_GET_CPU(env)->cpu_index,

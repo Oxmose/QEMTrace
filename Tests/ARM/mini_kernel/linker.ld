@@ -43,16 +43,52 @@ SECTIONS
 
     /* END OF ZEROING ZONE */
     _end = .;
+
+    /* Pagen code */
+    . = 0x80100000;
+    _pagencodeaddr = .;
+
+    /* Pagdis code */
+    . = 0x80110000;
+    _pagdiscodeaddr = .;    
  
-    /* Put the kernel stack after the BSS. */
-    kernel_stack_start = .;
-    . += 0x10000;
-    kernel_stack_end = .;
+    /* Put the stacks after the BSS. */
+    . = 0x80124000;
+    usr_stack_end = .;
+    . = 0x80128000;
+    fiq_stack_end = .;
+    . = 0x8012C000;
+    irq_stack_end = .;
+    . = 0x80130000;
+    svc_stack_end = .;
+    . = 0x80134000;
+    abt_stack_end = .;
+    . = 0x80138000;
+    undef_stack_end = .;
+
+    /* Memory regions */
+    . = 0x80200000;
+    reg_11_nc_ce_wt = .;
+    . = 0x80240000;
+    reg_11_c_ce_wt = .;
+    . = 0x80280000;
+    reg_1_inv_c_ce_wt = .;
+    . = 0x802C0000;
+    reg_11_c_ci_wt = .;
+    . = 0x80300000;
+    reg_1_1000_c_ce_wb = .;
+    . = 0x80340000;
 
     /**********************************************
      * SPECIFIC DATA STRUCTURES BASE ADDRESS
      *********************************************/
-    periph_base_address = .;
+    preif_base_address = .;
+    perif_gic_base_addr = 0x2C000000;
+    perif_serial0_base_addr = 0x1C090000;
+    perif_serial0_base_addr = 0x1C0A0000;
+    perif_serial0_base_addr = 0x1C0B0000;
+    perif_serial0_base_addr = 0x1C0C0000;
+
 
     
 }

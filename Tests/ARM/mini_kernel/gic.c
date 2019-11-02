@@ -26,8 +26,8 @@
  * GLOBAL VARIABLES
  ******************************************************************************/
 
-/** @brief Peripheral base address. */
-extern volatile uint32_t* periph_base_address;
+/** @brief Peripheral base address. Todo: add actual address */
+volatile uint32_t* periph_base_address;
 
 /*******************************************************************************
  * FUNCTIONS
