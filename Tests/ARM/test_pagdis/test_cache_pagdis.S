@@ -19,9 +19,10 @@ str r1, [r0, #4]
 str r1, [r0, #8]
 
 @ Enable cache
-mrc p15, 0, r0, c1, c0, 0 ; Read System Control Register
-or r0, r0, #0x1004
-mcr p15, 0, r0, c1, c0, 0 ; Write System Control Register
+mrc p15, 0, r0, c1, c0, 0
+mov r1, #0x1004
+orr r0, r0, r1
+mcr p15, 0, r0, c1, c0, 0 
 
 @ Compute address 
 mov r0, #0x8020

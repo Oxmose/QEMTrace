@@ -38,7 +38,7 @@ do
     sync
 
     # Make mini kernel
-    make && (make run > ../diff_file &)
+    make && (make run &> ../diff_file &)
 
     sleep 2
     pid=$(pidof qemu-system-arm)
@@ -124,7 +124,7 @@ do
 
     sync
     # Make mini kernel
-    make && (make run > ../diff_file &)
+    make && (make run &> ../diff_file &)
 
     sleep 2
 

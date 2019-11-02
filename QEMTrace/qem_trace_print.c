@@ -58,8 +58,6 @@ void qem_trace_disable(void)
 {
     /* Enable tracing state */
     qem_tracing_enabled = 0;
-
-    fflush(stdout);
 }
 
 void qem_trace_start_timer(void)
@@ -103,6 +101,7 @@ void qem_trace_output(uint32_t virt_addr, uint32_t phys_addr,
     {
         printf("LD ");
     }
+
     printf("| V 0x%08x | P 0x%08x | Core %d | Time %" PRIu64 " | RW: %c | ID: %c | PL: %c | E: %c | G: %c | S: %c | CR: %c | CL: %c | CI: %c | WT: %c | EX: %c\n",
            virt_addr, phys_addr, core, time,
            (flags & QEM_TRACE_ACCESS_TYPE_WRITE) ? 'W' : 'R',

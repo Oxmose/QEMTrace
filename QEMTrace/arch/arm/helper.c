@@ -184,6 +184,6 @@ void helper_qem_start_trace(CPUARMState *env)
 
 void helper_qem_stop_trace(void)
 {
-     qem_trace_disable();
+    qem_trace_disable();
 }
 #endif /* QEM_TRACE_ENABLED */
