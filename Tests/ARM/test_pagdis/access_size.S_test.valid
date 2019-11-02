@@ -1,0 +1,27 @@
+ALL
+I LD | V 0x80011314 | P 0x80011314 | Core 0 | Time 91592489849988 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80110000 | P 0x80110000 | Core 0 | Time 91599020351468 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+D ST | V 0x8012ffd8 | P 0x8012ffd8 | Core 0 | Time 91599020477036 | RW: W | ID: D | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+D ST | V 0x8012ffdc | P 0x8012ffdc | Core 0 | Time 91599020510678 | RW: W | ID: D | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80110004 | P 0x80110004 | Core 0 | Time 91601222295016 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80110008 | P 0x80110008 | Core 0 | Time 91604793842874 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x8011000c | P 0x8011000c | Core 0 | Time 91610375425350 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+D LD | V 0x80200000 | P 0x80200000 | Core 0 | Time 91610375453742 | RW: R | ID: D | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80110010 | P 0x80110010 | Core 0 | Time 91622966328968 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+D LD | V 0x80200000 | P 0x80200000 | Core 0 | Time 91622966452526 | RW: R | ID: D | PL: K | E: A | G: L | S: H | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80110014 | P 0x80110014 | Core 0 | Time 91634284860352 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+D LD | V 0x80200000 | P 0x80200000 | Core 0 | Time 91634284985954 | RW: R | ID: D | PL: K | E: A | G: L | S: B | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80110018 | P 0x80110018 | Core 0 | Time 91645947135044 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+D ST | V 0x80200000 | P 0x80200000 | Core 0 | Time 91645947262014 | RW: W | ID: D | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x8011001c | P 0x8011001c | Core 0 | Time 91648679835612 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+D ST | V 0x80200000 | P 0x80200000 | Core 0 | Time 91648679889704 | RW: W | ID: D | PL: K | E: A | G: L | S: H | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80110020 | P 0x80110020 | Core 0 | Time 91650730045004 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+D ST | V 0x80200000 | P 0x80200000 | Core 0 | Time 91650730162632 | RW: W | ID: D | PL: K | E: A | G: L | S: B | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80110024 | P 0x80110024 | Core 0 | Time 91659916585006 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+D LD | V 0x8012ffd8 | P 0x8012ffd8 | Core 0 | Time 91659916697920 | RW: R | ID: D | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+D LD | V 0x8012ffdc | P 0x8012ffdc | Core 0 | Time 91659916731838 | RW: R | ID: D | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80110028 | P 0x80110028 | Core 0 | Time 91666484234850 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80011318 | P 0x80011318 | Core 0 | Time 91670198889778 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80011324 | P 0x80011324 | Core 0 | Time 91672216653064 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80100000 | P 0x80100000 | Core 0 | Time 91672316970720 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
+I LD | V 0x80011328 | P 0x80011328 | Core 0 | Time 91672425867136 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: Y | CL: 1 | CI: Y | WT: E | EX: N
