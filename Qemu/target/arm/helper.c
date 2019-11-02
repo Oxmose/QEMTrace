@@ -8777,6 +8777,8 @@ static inline uint32_t regime_sctlr(CPUARMState *env, ARMMMUIdx mmu_idx)
  ******************************************************************************/
 #if QEM_TRACE_ENABLED
 bool regime_translation_disabled(CPUARMState *env,
+                                               ARMMMUIdx mmu_idx);
+bool regime_translation_disabled(CPUARMState *env,
                                                ARMMMUIdx mmu_idx)
 #else 
 static inline bool regime_translation_disabled(CPUARMState *env,
