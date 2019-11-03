@@ -31,5 +31,6 @@ void main(void)
 {
     serial_put_string("ARM Minikernel\n", 15);
     test_entry();
+    serial_put_string("ARM Minikernel Halting\n", 23);
     while(1);
 }

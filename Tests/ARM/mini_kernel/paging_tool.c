@@ -262,9 +262,6 @@ void create_pgtable(void)
     /* Map pagedis code 0x8011_0000 : 0x8011_0000 -> 1:1  WT */
     set_l1_pgt_entry(l1_pgtable, (uint32_t)&_pagdiscodeaddr, 0x80120000, 0x80110000, 
                      ARM_MMU_FLAG_WT_NWA | ARM_MMU_FLAG_RWX_ALL);
-    /* Map pagedis code 0x8011_0000 : 0x8011_0000 -> 1:1  WT */
-    set_l1_pgt_entry(l1_pgtable, (uint32_t)&_pagdiscodeaddr, 0x80120000, 0x80110000, 
-                     ARM_MMU_FLAG_WT_NWA | ARM_MMU_FLAG_RWX_ALL);
 
     /* Map stack 0x8012_0000 : 0x8012_4000 -> 1:1 WT */
     set_l1_pgt_entry(l1_pgtable, (uint32_t)&stacks_start, (uint32_t)&usr_stack_end, (uint32_t)&stacks_start, 

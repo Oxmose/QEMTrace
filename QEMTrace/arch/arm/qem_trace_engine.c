@@ -72,6 +72,7 @@ void qem_arm_get_info_addr_mem_trace(CPUARMState *env, vaddr addr,
                                    int32_t* access_mode)
 {
     int prot;
+    uint64_t reg;
     target_ulong page_size;
     MemTxAttrs attrs;
     ARMMMUFaultInfo fi;
@@ -80,10 +81,20 @@ void qem_arm_get_info_addr_mem_trace(CPUARMState *env, vaddr addr,
     *coherency_enabled = 0;
     *phys_addr = 0;
     *write_through_enabled = 0;
-
+    
     memset(&attrs, 0, sizeof(attrs));
     memset(&fi, 0, sizeof(fi));
     memset(&cacheattrs, 0, sizeof(cacheattrs));
+
+    /* Get the current CPSR */
+    if((env->uncached_cpsr & 0x1F) != 0x10)
+    {
+        reg = env->cp15.sctlr_s;
+    }
+    else 
+    {
+        reg = env->cp15.sctlr_ns;
+    }
 
     get_phys_addr(env, addr,
                         real_access_type, mmu_idx,
@@ -94,27 +105,16 @@ void qem_arm_get_info_addr_mem_trace(CPUARMState *env, vaddr addr,
     {
         *cache_inhibit = (cacheattrs.attrs & 0xF) == 0x4; 
         *write_through_enabled = (cacheattrs.attrs & 0x7) < 4 ? 1 : 0; 
-        *access_mode = attrs.secure;
     }
     else 
     {
         /* Check cache mode TODO*/
         *write_through_enabled = 1; 
-
-        /* Check current CPU mode */
-        *access_mode =  (env->uncached_cpsr & 0x1F) != 0x10;
     }
 
+    /* Check current CPU mode */
+    *access_mode = (env->uncached_cpsr & 0x1F) != 0x10;
 
-    uint64_t reg;
-    if((env->uncached_cpsr & 0x1F) != 0x10)
-    {
-        reg = env->cp15.sctlr_s;
-    }
-    else 
-    {
-        reg = env->cp15.sctlr_ns;
-    }
     /* Check cache state */
     if(real_access_type == MMU_DATA_LOAD || real_access_type == MMU_DATA_STORE)
     {
