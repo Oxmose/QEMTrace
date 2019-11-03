@@ -12,10 +12,13 @@ fi
 
 
 echo ""
-echo -e "\e[94m============================ ARM TEST AUTO: STRING ============================\e[39m"
+echo -e "\e[94m============================ ARM TEST AUTO: BINARY ============================\e[39m"
 echo ""
 
 test="_test.valid"
+
+# Compile converter tool
+g++ -mno-ms-bitfields ../bin_to_str.cpp -o ../bin_to_str.bin
 
 echo -e "\e[94m----------------------------- Paging Disabled Tests -----------------------------\e[39m"
 echo ""
@@ -40,7 +43,7 @@ do
     sync
 
     # Make mini kernel
-    make && (make run &> ../diff_file &)
+    make && (make run &)
 
     sleep 2
     pid=$(pidof qemu-system-arm)
@@ -49,6 +52,13 @@ do
     kill -KILL $pid
     sync
 
+    rm ../*.out
+
+    for ff in *.out
+    do
+        mv $ff ../$ff
+    done
+
     cd ..
 
     line1=$(cat "$entry$test" | head -n 1)
@@ -56,27 +66,30 @@ do
     if [ "$line1" = "DATA" ]
     then
         echo "DATA" > filtered_file
-        grep -E "^D (LD|ST)" diff_file >> filtered_file
     elif [ "$line1" = "INST" ]
     then
         echo "INST" > filtered_file
-        grep -E "^I (LD|ST)" diff_file >> filtered_file
     elif [ "$line1" = "ALL" ]
     then
         echo "ALL" > filtered_file
-        grep -E "^(D|I) (LD|ST)" diff_file >> filtered_file
     else
-        echo -e "\e[31mERROR WRONG FORMAT |$line1| \e[39m"
+        echo -e "\e[31mERROR WRONG FORMAT \e[39m"
         exit -1
     fi
+
+    for ff in *.out
+    do
+        ../bin_to_str.bin $ff 32 >> filtered_file
+    done
     sync
-    cut -d"|" -f1,2,3,4,6,7,8,9,10,11,12,13,14,15,16 "$entry$test" > newfile
-    cut -d"|" -f1,2,3,4,6,7,8,9,10,11,12,13,14,15,16 filtered_file > filtered_file_new
+    cut -d"|" -f1,3,4,6,7,8,9,10,11,12,13,14,15,16 "$entry$test" > newfile
+    cut -d"|" -f1,2,3,5,6,7,8,9,10,11,12,13,14,15 filtered_file > filtered_file_new
     sync
     sed -i 's/\s*$//' filtered_file_new
+    sed -i 's/\s*$//' newfile
     sync
     mv filtered_file_new filtered_file
-    sync
+
     diff newfile filtered_file >> /dev/null
     val=$?
 
@@ -91,7 +104,7 @@ do
         echo -e "\e[92mPASSED\e[39m"
     fi
 
-    rm filtered_file newfile diff_file
+    rm filtered_file newfile
 done
 echo ""
 if (( $error0 != 0 ))
@@ -126,7 +139,7 @@ do
 
     sync
     # Make mini kernel
-    make && (make run &> ../diff_file &)
+    make && (make run &)
 
     sleep 2
 
@@ -138,6 +151,12 @@ do
 
     sync
 
+    rm ../*.out
+
+    for ff in *.out
+    do
+        mv $ff ../$ff
+    done
 
     cd ..
 
@@ -146,31 +165,32 @@ do
     if [ "$line1" = "DATA" ]
     then
         echo "DATA" > filtered_file
-        grep -E "^D (LD|ST)" diff_file >> filtered_file
     elif [ "$line1" = "INST" ]
     then
         echo "INST" > filtered_file
-        grep -E "^I (LD|ST)" diff_file >> filtered_file
     elif [ "$line1" = "ALL" ]
     then
         echo "ALL" > filtered_file
-        grep -E "^(D|I) (LD|ST)" diff_file >> filtered_file
     else
-        echo -e "\e[31mERROR WRONG FORMAT: $line1 \e[39m"
+        echo -e "\e[31mERROR WRONG FORMAT \e[39m"
         exit -1
     fi
-    sync
 
-    cut -d"|" -f1,2,3,4,6,7,8,9,10,11,12,13,14,15,16 "$entry$test" > newfile
-    cut -d"|" -f1,2,3,4,6,7,8,9,10,11,12,13,14,15,16 filtered_file > filtered_file_new
+    for ff in *.out
+    do
+        ../bin_to_str.bin $ff 32 >> filtered_file
+    done
+    sync
+    cut -d"|" -f1,3,4,6,7,8,9,10,11,12,13,14,15,16 "$entry$test" > newfile
+    cut -d"|" -f1,2,3,5,6,7,8,9,10,11,12,13,14,15 filtered_file > filtered_file_new
     sync
     sed -i 's/\s*$//' filtered_file_new
-    mv filtered_file_new filtered_file
+    sed -i 's/\s*$//' newfile
     sync
+    mv filtered_file_new filtered_file
+
     diff newfile filtered_file >> /dev/null
     val=$?
-
-    
 
     } &> /dev/null
 
@@ -183,7 +203,7 @@ do
         echo -e "\e[92mPASSED \e[39m"
     fi
 
-    rm filtered_file newfile diff_file
+    rm filtered_file newfile
 done
 echo ""
 if (( $error1 != 0 ))
@@ -197,10 +217,10 @@ echo ""
 
 if (( $error0 != 0  ||  $error1 != 0 ))
 then
-    echo -e "\e[31m------------------------- ARM TEST AUTO STRING FAILED -------------------------\e[39m"
+    echo -e "\e[31m------------------------- ARM TEST AUTO BINARY FAILED -------------------------\e[39m"
 
 else
-    echo -e "\e[92m------------------------- ARM TEST AUTO STRING PASSED -------------------------\e[39m"
+    echo -e "\e[92m------------------------- ARM TEST AUTO BINARY PASSED -------------------------\e[39m"
 fi
 error=$(($error0 + $error1))
 exit $error

@@ -14,8 +14,8 @@ echo -e "\e[94m============================= ARM TEST AUTO: FULL ===============
 echo "Compiling..."
 {
 # Modify output to printf
-sed -i 's/QEM_TRACE_TYPE QEM_TRACE_FILE/QEM_TRACE_TYPE QEM_TRACE_PRINT/g' ../../QEMTrace/qem_trace_config.h
-sed -i 's/QEM_TRACE_TYPE QEM_TRACE_SMI/QEM_TRACE_TYPE QEM_TRACE_PRINT/g' ../../QEMTrace/qem_trace_config.h
+sed -i 's/QEM_TRACE_TYPE QEM_TRACE_PRINT/QEM_TRACE_TYPE QEM_TRACE_FILE/g' ../../QEMTrace/qem_trace_config.h
+sed -i 's/QEM_TRACE_TYPE QEM_TRACE_SMI/QEM_TRACE_TYPE QEM_TRACE_FILE/g' ../../QEMTrace/qem_trace_config.h
 
 # Compile qemu
 mkdir -p ../../Qemu/build
@@ -32,8 +32,40 @@ make
 cd ../../Tests/ARM
 } &> /dev/null
 
-./test_suite_auto_str.sh
+./test_suite_auto_bin.sh
 error=$?
+
+echo "Compiling..."
+{
+# Modify output to printf
+sed -i 's/QEM_TRACE_TYPE QEM_TRACE_FILE/QEM_TRACE_TYPE QEM_TRACE_PRINT/g' ../../QEMTrace/qem_trace_config.h
+
+# Compile qemu
+cd ../../Qemu/build
+make
+
+# Launch test
+cd ../../Tests/ARM
+} &> /dev/null
+
+./test_suite_auto_str.sh
+error=$(($? + $error))
+
+echo "Compiling..."
+{
+# Modify output to printf
+sed -i 's/QEM_TRACE_TYPE QEM_TRACE_PRINT/QEM_TRACE_TYPE QEM_TRACE_SMI/g' ../../QEMTrace/qem_trace_config.h
+
+# Compile qemu
+cd ../../Qemu/build
+make
+
+# Launch test
+cd ../../Tests/ARM
+} &> /dev/null
+
+./test_suite_auto_smi.sh
+error=$(($? + $error))
 
 
 echo ""

@@ -33,7 +33,7 @@ init_paging:
     ldr r1, =page_table_lvl1
     and r0, r0, #0x4
     orr r0, r1, r0 
-    add r0, r0, #0x52
+    add r0, r0, #0x21
     mcr p15, 0, r0, c2, c0, 0 
 
     bl invalidate_tlb

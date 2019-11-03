@@ -12,10 +12,30 @@ fi
 
 
 echo ""
-echo -e "\e[94m============================ ARM TEST AUTO: STRING ============================\e[39m"
+echo -e "\e[94m============================ ARM TEST AUTO: SMI ============================\e[39m"
 echo ""
 
 test="_test.valid"
+
+# Compile converter tool
+g++ -mno-ms-bitfields ../bin_to_str.cpp -o ../bin_to_str.bin
+
+
+echo ""
+echo -e "Compiling SMI client"
+echo ""
+
+# Compile SMI client
+cd ../../SMILib
+make
+cd ../Tests/ARM
+gcc -std=c99 -O2 test_smi_client.c -L../../SMILib/lib -lsmi -lpthread -lrt -o smi_client
+
+if (( $? != 0 ))
+then
+    echo -e "\e[31mERROR Could not compile SMI client\e[39m"
+    exit 1
+fi
 
 echo -e "\e[94m----------------------------- Paging Disabled Tests -----------------------------\e[39m"
 echo ""
@@ -40,13 +60,25 @@ do
     sync
 
     # Make mini kernel
-    make && (make run &> ../diff_file &)
+    make && (make run &)
+    sleep 1;
 
-    sleep 2
+    # Run SMI client
+    ../smi_client > ../diff_file&
+
+    sleep 1;
+
     pid=$(pidof qemu-system-arm)
 
-    sync
+ 
     kill -KILL $pid
+    sync
+    if [ $env_os = 2 ]
+    then
+        ps -W | awk '/smi_client.exe/,NF=1' | xargs kill -f
+    else
+        killall smi_client
+    fi
     sync
 
     cd ..
@@ -64,18 +96,20 @@ do
     elif [ "$line1" = "ALL" ]
     then
         echo "ALL" > filtered_file
-        grep -E "^(D|I) (LD|ST)" diff_file >> filtered_file
+        grep -E "^(D|I|INV|FL/INV|FL|U|L|P) (LD|ST)" diff_file >> filtered_file
     else
         echo -e "\e[31mERROR WRONG FORMAT |$line1| \e[39m"
         exit -1
     fi
+
     sync
-    cut -d"|" -f1,2,3,4,6,7,8,9,10,11,12,13,14,15,16 "$entry$test" > newfile
-    cut -d"|" -f1,2,3,4,6,7,8,9,10,11,12,13,14,15,16 filtered_file > filtered_file_new
+    cut -d"|" -f1,3,4,6,7,8,9,10,11,12,13,14,15,16 "$entry$test" > newfile
+    cut -d"|" -f1,2,3,5,6,7,8,9,10,11,12,13,14,15 filtered_file > filtered_file_new
     sync
     sed -i 's/\s*$//' filtered_file_new
     sync
     mv filtered_file_new filtered_file
+
     sync
     diff newfile filtered_file >> /dev/null
     val=$?
@@ -91,7 +125,7 @@ do
         echo -e "\e[92mPASSED\e[39m"
     fi
 
-    rm filtered_file newfile diff_file
+    rm filtered_file newfile
 done
 echo ""
 if (( $error0 != 0 ))
@@ -126,18 +160,26 @@ do
 
     sync
     # Make mini kernel
-    make && (make run &> ../diff_file &)
+    make && (make run &)
+    sleep 1;
 
-    sleep 2
+    # Run SMI client
+    ../smi_client > ../diff_file&
 
-    sync
+    sleep 1;
 
     pid=$(pidof qemu-system-arm)
+
  
     kill -KILL $pid
-
     sync
-
+    if [ $env_os = 2 ]
+    then
+        ps -W | awk '/smi_client.exe/,NF=1' | xargs kill -f
+    else
+        killall smi_client
+    fi
+    sync
 
     cd ..
 
@@ -154,23 +196,23 @@ do
     elif [ "$line1" = "ALL" ]
     then
         echo "ALL" > filtered_file
-        grep -E "^(D|I) (LD|ST)" diff_file >> filtered_file
+        grep -E "^(D|I|INV|FL/INV|FL|U|L|P) (LD|ST)" diff_file >> filtered_file
     else
-        echo -e "\e[31mERROR WRONG FORMAT: $line1 \e[39m"
+        echo -e "\e[31mERROR WRONG FORMAT |$line1| \e[39m"
         exit -1
     fi
-    sync
 
-    cut -d"|" -f1,2,3,4,6,7,8,9,10,11,12,13,14,15,16 "$entry$test" > newfile
-    cut -d"|" -f1,2,3,4,6,7,8,9,10,11,12,13,14,15,16 filtered_file > filtered_file_new
+    sync
+    cut -d"|" -f1,3,4,6,7,8,9,10,11,12,13,14,15,16 "$entry$test" > newfile
+    cut -d"|" -f1,2,3,5,6,7,8,9,10,11,12,13,14,15 filtered_file > filtered_file_new
     sync
     sed -i 's/\s*$//' filtered_file_new
+    sync
     mv filtered_file_new filtered_file
+
     sync
     diff newfile filtered_file >> /dev/null
     val=$?
-
-    
 
     } &> /dev/null
 
@@ -183,7 +225,7 @@ do
         echo -e "\e[92mPASSED \e[39m"
     fi
 
-    rm filtered_file newfile diff_file
+    rm filtered_file newfile
 done
 echo ""
 if (( $error1 != 0 ))
@@ -197,10 +239,10 @@ echo ""
 
 if (( $error0 != 0  ||  $error1 != 0 ))
 then
-    echo -e "\e[31m------------------------- ARM TEST AUTO STRING FAILED -------------------------\e[39m"
+    echo -e "\e[31m------------------------- ARM TEST AUTO SMI FAILED -------------------------\e[39m"
 
 else
-    echo -e "\e[92m------------------------- ARM TEST AUTO STRING PASSED -------------------------\e[39m"
+    echo -e "\e[92m------------------------- ARM TEST AUTO SMI PASSED -------------------------\e[39m"
 fi
 error=$(($error0 + $error1))
 exit $error
