@@ -33,7 +33,9 @@
 loader:
     @ Deactivate all AP cpu 
     mrc p15, 0, r1, c0, c0, 5
-    mov r0, #0x0F03
+    mov r0, #0x0F0
+    lsl r0, r0, 4
+    add r0, r0, #3
     and r1, r1, r0 
     mov r0, #0
     cmp r1, r0 
