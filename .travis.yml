@@ -8,6 +8,7 @@ addons:
             - g++
             - nasm
             - gcc-powerpc-linux-gnu
+            - gcc-arm-none-eabi
 cache:
     directories:
         - ./Qemu
