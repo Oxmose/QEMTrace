@@ -51,7 +51,7 @@
 #define QEM_TRACE_SMI   2
 
 /* Select the trace type */
-#define QEM_TRACE_TYPE QEM_TRACE_FILE
+#define QEM_TRACE_TYPE QEM_TRACE_PRINT
 
 /* Modify this value depending on the system you want to trace
  * 0 = 32 Bits target

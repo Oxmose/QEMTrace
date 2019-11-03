@@ -24,19 +24,16 @@
  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "qem_trace_config.h" /* QEMTrace configuration */
+#include "../../qem_trace_config.h" /* QEMTrace configuration */
 
 #if QEM_TRACE_ENABLED
 
-#if defined(TARGET_PPC)
-#include "arch/ppc/helper.h"
-#endif
+DEF_HELPER_4(qem_instld_trace, void, env, tl, int, int)
 
-#if defined(TARGET_X86_64) || defined(TARGET_I386)
-#include "arch/i386/helper.h"
-#endif
+DEF_HELPER_4(qem_datald_trace, void, env, tl, int, int)
+DEF_HELPER_4(qem_datast_trace, void, env, tl, int, int)
 
-#if defined(TARGET_ARM)
-#include "arch/arm/helper.h"
-#endif
+DEF_HELPER_1(qem_start_trace, void, env)
+DEF_HELPER_0(qem_stop_trace, void)
+
 #endif /* QEM_TRACE_ENABLED */

@@ -1,0 +1,26 @@
+@ cache_inhib.asm
+@
+@ Author  Alexy Torres Aurora Dugo
+@ Version 1.0
+@
+@ MiniKernel test: Check behaviours on cache inhibited memory
+
+push {r0, r1}
+
+@ Enable cache
+mrc p15, 0, r0, c1, c0, 0
+mov r1, #0x1004
+orr r0, r0, r1
+mcr p15, 0, r0, c1, c0, 0 
+
+@ Normal access
+mov r0, #0x8028
+lsl r0, r0, #16
+ldr r1, [r0]
+
+@ Cache inhibited access
+mov r0, #0x802C
+lsl r0, r0, #16
+ldr r1, [r0]
+
+pop {r0, r1}

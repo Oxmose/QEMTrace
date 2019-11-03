@@ -19,6 +19,15 @@
 #include "fpu/softfloat.h"
 #include "qemu/range.h"
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#include "../../QEMTrace/qem_trace_engine.h"
+#include "../../QEMTrace/qem_trace_config.h"
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
 #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable */
 
 #ifndef CONFIG_USER_ONLY
@@ -28,12 +37,25 @@ typedef struct ARMCacheAttrs {
     unsigned int shareability:2; /* as in the SH field of the VMSAv8-64 PTEs */
 } ARMCacheAttrs;
 
-static bool get_phys_addr(CPUARMState *env, target_ulong address,
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+bool get_phys_addr(CPUARMState *env, target_ulong address,
                           MMUAccessType access_type, ARMMMUIdx mmu_idx,
                           hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
                           target_ulong *page_size,
                           ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs);
-
+#else
+static bool get_phys_addr(CPUARMState *env, target_ulong address,
+                          MMUAccessType access_type, ARMMMUIdx mmu_idx,
+                          hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
+                          target_ulong *page_size,
+                          ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs); 
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
                                MMUAccessType access_type, ARMMMUIdx mmu_idx,
                                hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
@@ -8750,8 +8772,21 @@ static inline uint32_t regime_sctlr(CPUARMState *env, ARMMMUIdx mmu_idx)
 }
 
 /* Return true if the specified stage of address translation is disabled */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+bool regime_translation_disabled(CPUARMState *env,
+                                               ARMMMUIdx mmu_idx);
+bool regime_translation_disabled(CPUARMState *env,
+                                               ARMMMUIdx mmu_idx)
+#else 
 static inline bool regime_translation_disabled(CPUARMState *env,
                                                ARMMMUIdx mmu_idx)
+#endif /* */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 {
     if (arm_feature(env, ARM_FEATURE_M)) {
         switch (env->v7m.mpu_ctrl[regime_is_secure(env, mmu_idx)] &
@@ -10739,11 +10774,25 @@ static ARMCacheAttrs combine_cacheattrs(ARMCacheAttrs s1, ARMCacheAttrs s2)
  * @fi: set to fault info if the translation fails
  * @cacheattrs: (if non-NULL) set to the cacheability/shareability attributes
  */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+bool get_phys_addr(CPUARMState *env, target_ulong address,
+                          MMUAccessType access_type, ARMMMUIdx mmu_idx,
+                          hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
+                          target_ulong *page_size,
+                          ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs)
+#else
 static bool get_phys_addr(CPUARMState *env, target_ulong address,
                           MMUAccessType access_type, ARMMMUIdx mmu_idx,
                           hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
                           target_ulong *page_size,
                           ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs)
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 {
     if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
         /* Call ourselves recursively to do the stage 1 and then stage 2

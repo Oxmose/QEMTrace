@@ -1,6 +1,7 @@
 #!/bin/bash
 
 error=0
+arm-none-eabi-gcc --version
 cd Tests
 for d in */ ; do
     echo -e "\e[92m In $d\e[39m"

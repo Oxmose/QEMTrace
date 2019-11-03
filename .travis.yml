@@ -19,4 +19,8 @@ matrix:
 before_install:
     - if [ "$TRAVIS_OS_NAME" = "linux"  ]; then sudo apt-get -qq update;    fi
 
+before_script:
+    - wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/8-2018q4/gcc-arm-none-eabi-8-2018-q4-major-linux.tar.bz2 -O /tmp/gcc-arm-none-eabi.tar.bz2
+    - tar -xvjf /tmp/gcc-arm-none-eabi.tar.bz2
+    - export PATH=$PATH:$PWD/gcc-arm-none-eabi-8-2018-q4-major/bin/
 script: ./.build-travis.sh
