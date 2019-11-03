@@ -118,7 +118,7 @@ do
 
     sync
 
-    cat "$entry" >> mini_kernel/test_pagdis_glob.S.inc
+    cat "$entry" >> mini_kernel/test_pagen_glob.S.inc
 
     cd mini_kernel
 

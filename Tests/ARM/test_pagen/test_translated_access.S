@@ -10,19 +10,23 @@
 push {r0, r1}
 
 @ 1:1
-ldr r0, =0x80200000
+mov r0, #0x8020
+lsl r0, #16
 ldr r1, [r0]
 
 @ 0x8011_0000 : 0x8040_0000
-ldr r0, =0x80110000
+mov r0, #0x8011
+lsl r0, #16
 ldr r1, [r0]
 
 @ 0x8028_0000 : 0x80B0_0000
-ldr r0, =0x80280000
+mov r0, #0x8028
+lsl r0, #16
 ldr r1, [r0]
 
 @ 0x8030_0000 : 0x8030_1000
-ldr r0, =0x80300000
+mov r0, #0x8030
+lsl r0, #16
 ldr r1, [r0]
 
 @ Restore registers

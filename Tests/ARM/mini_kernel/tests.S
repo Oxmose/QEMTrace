@@ -18,24 +18,14 @@ bl code_relocate
 
 @ Paging disabled tests
 ldr r0, =_pagdiscodeaddr
-@ Enable tracing: 0xFFFFFFF0
-.long 0xFFFFFFF0
-
 blx r0
-
-@ Disable tracing: 0xFFFFFFF1
-.long 0xFFFFFFF1
 
 bl enable_paging
 
 @ Paging enabled tests
 ldr r0, =_pagencodeaddr
-@ Enable tracing: 0xFFFFFFF0
-.long 0xFFFFFFF0
 blx r0
 
-@ Disable tracing: 0xFFFFFFF1
-.long 0xFFFFFFF1
 
 pop {r0, r1, r2, r3, r11, lr}
 bx lr
@@ -51,12 +41,22 @@ code_relocate:
 code_relocate_end:
     bx lr
 
-@ Relocate the codes
+@ Relocated codes protion
+
 pagdiscodestart:
+@ Enable tracing: 0xFFFFFFF0
+.long 0xFFFFFFF0
 .include "test_pagdis_glob.S.inc"
+@ Disable tracing: 0xFFFFFFF1
+.long 0xFFFFFFF1
 bx lr
 pagdiscodeend:
+
 pagencodestart:
+@ Enable tracing: 0xFFFFFFF0
+.long 0xFFFFFFF0
 .include "test_pagen_glob.S.inc"
+@ Disable tracing: 0xFFFFFFF1
+.long 0xFFFFFFF1
 bx lr
 pagencodeend:
