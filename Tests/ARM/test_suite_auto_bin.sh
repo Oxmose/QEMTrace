@@ -30,7 +30,7 @@ for entry in "./test_pagdis"/*.S
 do
     echo -n "Test: $entry "
 
-    # {
+    {
 
     # Remove the global test file and create a new one
     rm -f mini_kernel/test_pagdis_glob.S.inc mini_kernel/test_pagen_glob.S.inc
@@ -93,7 +93,7 @@ do
     diff newfile filtered_file >> /dev/null
     val=$?
 
-    # } &> /dev/null
+    } &> /dev/null
 
     if (( $val != 0 ))
     then
