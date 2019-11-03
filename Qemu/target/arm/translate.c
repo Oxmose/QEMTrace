@@ -10022,6 +10022,16 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
                         tcg_temp_free_i32(addr);
 
                         tmp = load_reg(s, rm);
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+    gen_qem_datald_trace(taddr, (int)opc & MO_SIZE, s->mmu_idx);
+    gen_qem_datast_trace(taddr, (int)opc & MO_SIZE, s->mmu_idx);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
                         tcg_gen_atomic_xchg_i32(tmp, taddr, tmp,
                                                 get_mem_index(s), opc);
                         tcg_temp_free(taddr);

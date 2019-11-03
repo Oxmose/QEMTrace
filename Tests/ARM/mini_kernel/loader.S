@@ -14,11 +14,10 @@
 @-----------------------------------------
 @ EXTERN FUNCTIONS
 @-----------------------------------------
-.extern kernel_stack_end
-.extern kernel_kickstart
 .extern _edata
 .extern _end
 .extern global_sw_int_handler
+.extern init_paging
 
 .global loader @ Kernel entry point
 
@@ -62,6 +61,9 @@ init:
 
     @ Setup interrupt vector
     bl int_vector_init
+
+    @ Initialize paging
+    bl init_paging
 
     @ Kickstart the kernel 
     bl main

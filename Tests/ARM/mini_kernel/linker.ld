@@ -48,11 +48,15 @@ SECTIONS
     . = 0x80100000;
     _pagencodeaddr = .;
 
+    _pagencodeaddr_phys = 0x80400000;
+
     /* Pagdis code */
     . = 0x80110000;
     _pagdiscodeaddr = .;    
  
     /* Put the stacks after the BSS. */
+    . = 0x80120000;
+    stacks_start = .;
     . = 0x80124000;
     usr_stack_end = .;
     . = 0x80128000;
@@ -82,12 +86,15 @@ SECTIONS
     /**********************************************
      * SPECIFIC DATA STRUCTURES BASE ADDRESS
      *********************************************/
-    preif_base_address = .;
+
+    page_table_lvl1 = 0x80A00000;
+    page_table_lvl2 = 0x80A04000;
+
     perif_gic_base_addr = 0x2C000000;
     perif_serial0_base_addr = 0x1C090000;
-    perif_serial0_base_addr = 0x1C0A0000;
-    perif_serial0_base_addr = 0x1C0B0000;
-    perif_serial0_base_addr = 0x1C0C0000;
+    perif_serial1_base_addr = 0x1C0A0000;
+    perif_serial2_base_addr = 0x1C0B0000;
+    perif_serial3_base_addr = 0x1C0C0000;
 
 
     

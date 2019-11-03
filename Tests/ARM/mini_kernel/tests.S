@@ -10,7 +10,7 @@ ldr r1, =pagdiscodestart
 ldr r2, =pagdiscodeend
 bl code_relocate
 
-ldr r0, =_pagencodeaddr
+ldr r0, =_pagencodeaddr_phys
 
 ldr r1, =pagencodestart
 ldr r2, =pagencodeend
@@ -25,6 +25,8 @@ blx r0
 
 @ Disable tracing: 0xFFFFFFF1
 .long 0xFFFFFFF1
+
+bl enable_paging
 
 @ Paging enabled tests
 ldr r0, =_pagencodeaddr
@@ -51,10 +53,10 @@ code_relocate_end:
 
 @ Relocate the codes
 pagdiscodestart:
-.include "test_pagdis_glob.S"
+.include "test_pagdis_glob.S.inc"
 bx lr
 pagdiscodeend:
 pagencodestart:
-.include "test_pagen_glob.S"
+.include "test_pagen_glob.S.inc"
 bx lr
 pagencodeend:

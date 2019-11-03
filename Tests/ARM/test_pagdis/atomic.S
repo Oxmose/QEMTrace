@@ -23,4 +23,7 @@ strexh r1, r2, [r0]
 ldrexd r2, r3, [r0]
 strexd r1, r2, [r0]
 
+swp r1, r2, [r0]
+swpb r1, r2, [r0]
+
 pop {r0-r3}
