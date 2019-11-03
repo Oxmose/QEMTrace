@@ -105,9 +105,12 @@ void qem_arm_get_info_addr_mem_trace(CPUARMState *env, vaddr addr,
     {
         *cache_inhibit = (cacheattrs.attrs & 0xF) == 0x4; 
         *write_through_enabled = (cacheattrs.attrs & 0x7) < 4 ? 1 : 0; 
+
     }
     else 
     {
+        *cache_inhibit = 0;
+
         /* Check cache mode TODO*/
         *write_through_enabled = 1; 
     }
