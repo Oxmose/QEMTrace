@@ -136,6 +136,36 @@ void helper_qem_datast_trace_direct(CPUPPCState *env, target_ulong virt_addr,
     }
 }
 
+void helper_qem_datast_ex_trace_direct(CPUPPCState *env, target_ulong virt_addr,
+                                int size)
+{
+    if(qem_tracing_enabled == 1)
+    {
+        /* Get information about the adreess */
+        target_ulong haddr;
+        int32_t coherency_enabled;
+        int32_t cache_inhibit;
+        int32_t wt_enable;
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
+                                    &wt_enable,
+                                    &cache_inhibit, &coherency_enabled);
+
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_WRITE |
+                         QEM_TRACE_DATA_TYPE_DATA | QEM_TRACE_EVENT_EXCLUSIVE;
+
+        unsigned a, d;
+        GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
+                      coherency_enabled, size)
+
+        qem_trace_output(virt_addr,
+                                haddr,
+                                ENV_GET_CPU(env)->cpu_index,
+                                ((uint64_t) a) | (((uint64_t) d) << 32),
+                                flags);
+    }
+}
+
 void helper_qem_datald_trace_direct(CPUPPCState *env, target_ulong virt_addr,
                                 int size)
 {
@@ -166,6 +196,37 @@ void helper_qem_datald_trace_direct(CPUPPCState *env, target_ulong virt_addr,
     }
 }
 
+void helper_qem_datald_ex_trace_direct(CPUPPCState *env, target_ulong virt_addr,
+                                int size)
+{
+    if(qem_tracing_enabled == 1)
+    {
+        /* Get information about the adreess */
+        target_ulong haddr;
+        int32_t coherency_enabled;
+        int32_t cache_inhibit;
+        int32_t wt_enable;
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
+                                    &wt_enable,
+                                    &cache_inhibit, &coherency_enabled);
+
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_READ |
+                         QEM_TRACE_DATA_TYPE_DATA | QEM_TRACE_EVENT_EXCLUSIVE;
+
+        unsigned a, d;
+        GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
+                      coherency_enabled, size)
+
+        qem_trace_output(virt_addr,
+                                haddr,
+                                ENV_GET_CPU(env)->cpu_index,
+                                ((uint64_t) a) | (((uint64_t) d) << 32),
+                                flags);
+    }
+}
+
+
 void helper_qem_datast_trace(CPUPPCState *env, target_ulong simm,
                          int reg, int size)
 {
@@ -175,6 +236,17 @@ void helper_qem_datast_trace(CPUPPCState *env, target_ulong simm,
         helper_qem_datast_trace_direct(env, virt_addr, size);
     }
 }
+
+void helper_qem_datast_ex_trace_trad(CPUPPCState *env, int reg0,
+                              int reg1, int size)
+{
+    if(qem_tracing_enabled == 1)
+    {
+        target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
+        helper_qem_datast_ex_trace_direct(env, virt_addr, size);
+    }
+}
+
 
 void helper_qem_datast_trace_trad(CPUPPCState *env, int reg0,
                               int reg1, int size)
@@ -203,6 +275,16 @@ void helper_qem_datald_trace_trad(CPUPPCState *env, int reg0,
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
         helper_qem_datald_trace_direct(env, virt_addr, size);
+    }
+}
+
+void helper_qem_datald_ex_trace_trad(CPUPPCState *env, int reg0,
+                              int reg1, int size)
+{
+    if(qem_tracing_enabled == 1)
+    {
+        target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
+        helper_qem_datald_ex_trace_direct(env, virt_addr, size);
     }
 }
 

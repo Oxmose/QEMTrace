@@ -131,6 +131,20 @@ static void gen_qem_datald_trace_trad(const int reg0, const int reg1,
     tcg_temp_free_i32(t2);
 }
 
+static void gen_qem_datald_ex_trace_trad(const int reg0, const int reg1,
+                                  const int size)
+{
+    /* Call the trace helper */
+    TCGv_i32 t0 = tcg_const_i32(reg0);
+    TCGv_i32 t1 = tcg_const_i32(reg1);
+    TCGv_i32 t2 = tcg_const_i32(size);
+    gen_helper_qem_datald_ex_trace_trad(cpu_env, t0, t1, t2);
+    tcg_temp_free_i32(t0);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+}
+
+
 static void gen_qem_datald_trace_ld8u(const target_ulong simm, const int reg)
 {
     gen_qem_datald_trace(simm, reg, 1);
@@ -201,6 +215,19 @@ static void gen_qem_datast_trace_trad(const int reg0, const int reg1,
     TCGv_i32 t1 = tcg_const_i32(reg1);
     TCGv_i32 t2 = tcg_const_i32(size);
     gen_helper_qem_datast_trace_trad(cpu_env, t0, t1, t2);
+    tcg_temp_free_i32(t0);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+}
+
+static void gen_qem_datast_ex_trace_trad(const int reg0, const int reg1,
+                                  const int size)
+{
+    /* Call the trace helper */
+    TCGv_i32 t0 = tcg_const_i32(reg0);
+    TCGv_i32 t1 = tcg_const_i32(reg1);
+    TCGv_i32 t2 = tcg_const_i32(size);
+    gen_helper_qem_datast_ex_trace_trad(cpu_env, t0, t1, t2);
     tcg_temp_free_i32(t0);
     tcg_temp_free_i32(t1);
     tcg_temp_free_i32(t2);
@@ -3484,8 +3511,8 @@ static void gen_load_locked(DisasContext *ctx, TCGMemOp memop)
  * QEMTrace START 
  ******************************************************************************/ 
 #if QEM_TRACE_ENABLED
-    gen_qem_datald_trace_trad(rA(ctx->opcode), rB(ctx->opcode), 
-                          MEMOP_GET_SIZE(memop));
+    gen_qem_datald_ex_trace_trad(rA(ctx->opcode), rB(ctx->opcode), 
+                                 MEMOP_GET_SIZE(memop));
 #endif /* QEM_TRACE_ENABLED */
 /******************************************************************************* 
  * QEMTrace END 
@@ -3583,6 +3610,16 @@ static void gen_ld_atomic(DisasContext *ctx, TCGMemOp memop)
         tcg_gen_atomic_fetch_smin_tl(dst, EA, src, ctx->mem_idx, memop);
         break;
     case 8: /* Swap */
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+        gen_qem_datast_ex_trace_trad(rA(ctx->opcode), rB(ctx->opcode),
+                                     MEMOP_GET_SIZE(memop));
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
         tcg_gen_atomic_xchg_tl(dst, EA, src, ctx->mem_idx, memop);
         break;
 
@@ -3776,8 +3813,8 @@ static void gen_conditional_store(DisasContext *ctx, TCGMemOp memop)
  * QEMTrace START
  ******************************************************************************/
 #if QEM_TRACE_ENABLED
-    gen_qem_datast_trace_trad(rA(ctx->opcode), rB(ctx->opcode),
-                          MEMOP_GET_SIZE(memop));
+    gen_qem_datast_ex_trace_trad(rA(ctx->opcode), rB(ctx->opcode),
+                                 MEMOP_GET_SIZE(memop));
 #endif /* QEM_TRACE_ENABLED */
 /*******************************************************************************
  * QEMTrace END
