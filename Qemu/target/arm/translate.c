@@ -113,9 +113,24 @@ static void gen_qem_datald_trace(const TCGv addr,
     /* Call the trace helper */
     TCGv_i32 t1 = tcg_const_i32(size);
     TCGv_i32 t2 = tcg_const_i32(mmu_idx);
-    gen_helper_qem_datald_trace(cpu_env, addr, t1, t2);
+    TCGv_i32 t3 = tcg_const_i32(0);
+    gen_helper_qem_datald_trace(cpu_env, addr, t1, t2, t3);
     tcg_temp_free_i32(t1);
     tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+}
+
+static void gen_qem_datald_ex_trace(const TCGv addr,
+                                 const int size, int mmu_idx)
+{
+    /* Call the trace helper */
+    TCGv_i32 t1 = tcg_const_i32(size);
+    TCGv_i32 t2 = tcg_const_i32(mmu_idx);
+    TCGv_i32 t3 = tcg_const_i32(1);
+    gen_helper_qem_datald_trace(cpu_env, addr, t1, t2, t3);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
 }
 
 /*************************************** STORE ********************************/
@@ -126,9 +141,24 @@ static void gen_qem_datast_trace(const TCGv addr,
     /* Call the trace helper */
     TCGv_i32 t1 = tcg_const_i32(size);
     TCGv_i32 t2 = tcg_const_i32(mmu_idx);
-    gen_helper_qem_datast_trace(cpu_env, addr, t1, t2);
+    TCGv_i32 t3 = tcg_const_i32(0);
+    gen_helper_qem_datast_trace(cpu_env, addr, t1, t2, t3);
     tcg_temp_free_i32(t1);
     tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
+}
+
+static void gen_qem_datast_ex_trace(const TCGv addr,
+                                 const int size, int mmu_idx)
+{
+    /* Call the trace helper */
+    TCGv_i32 t1 = tcg_const_i32(size);
+    TCGv_i32 t2 = tcg_const_i32(mmu_idx);
+    TCGv_i32 t3 = tcg_const_i32(1);
+    gen_helper_qem_datast_trace(cpu_env, addr, t1, t2, t3);
+    tcg_temp_free_i32(t1);
+    tcg_temp_free_i32(t2);
+    tcg_temp_free_i32(t3);
 }
 
 #endif /* QEM_TRACE_ENABLED */
@@ -1196,6 +1226,30 @@ static void gen_aa32_ld_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
     tcg_gen_qemu_ld_i32(val, addr, index, opc);
     tcg_temp_free(addr);
 }
+
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+static void gen_aa32_ld_nt_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
+                            int index, TCGMemOp opc)
+{
+    TCGv addr;
+
+    if (arm_dc_feature(s, ARM_FEATURE_M) &&
+        !arm_dc_feature(s, ARM_FEATURE_M_MAIN)) {
+        opc |= MO_ALIGN;
+    }
+
+    addr = gen_aa32_addr(s, a32, opc);
+
+    tcg_gen_qemu_ld_i32(val, addr, index, opc);
+    tcg_temp_free(addr);
+}
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
 
 static void gen_aa32_st_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
                             int index, TCGMemOp opc)
@@ -8822,17 +8876,19 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
          * but this code must treat BE32 user-mode like BE32 system.
          */
         TCGv taddr = gen_aa32_addr(s, addr, opc);
-
 /*******************************************************************************
  * QEMTrace START
  ******************************************************************************/
 #if QEM_TRACE_ENABLED
-    gen_qem_datald_trace(taddr, (int)opc & MO_SIZE, s->mmu_idx);
+        gen_qem_datald_ex_trace(taddr, (int)opc & MO_SIZE, s->mmu_idx);
+#else 
+        
 #endif /* QEM_TRACE_ENABLED */
 /*******************************************************************************
  * QEMTrace END
  ******************************************************************************/
         tcg_gen_qemu_ld_i64(t64, taddr, get_mem_index(s), opc);
+
         tcg_temp_free(taddr);
         tcg_gen_mov_i64(cpu_exclusive_val, t64);
         if (s->be_data == MO_BE) {
@@ -8844,7 +8900,18 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
 
         store_reg(s, rt2, tmp2);
     } else {
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#if QEM_TRACE_ENABLED
+        gen_aa32_ld_nt_i32(s, tmp, addr, get_mem_index(s), opc);
+        gen_qem_datald_ex_trace(addr, (int)opc & MO_SIZE, s->mmu_idx);
+#else 
         gen_aa32_ld_i32(s, tmp, addr, get_mem_index(s), opc);
+#endif /* QEM_TRACE_ENABLED */
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
         tcg_gen_extu_i32_i64(cpu_exclusive_val, tmp);
     }
 
@@ -8908,7 +8975,7 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
  * QEMTrace START
  ******************************************************************************/
 #if QEM_TRACE_ENABLED
-    gen_qem_datast_trace(taddr, (int)opc & MO_SIZE, s->mmu_idx);
+    gen_qem_datast_ex_trace(taddr, (int)opc & MO_SIZE, s->mmu_idx);
 #endif /* QEM_TRACE_ENABLED */
 /*******************************************************************************
  * QEMTrace END
@@ -8930,7 +8997,7 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
  * QEMTrace START
  ******************************************************************************/
 #if QEM_TRACE_ENABLED
-    gen_qem_datast_trace(taddr, (int)opc & MO_SIZE, s->mmu_idx);
+    gen_qem_datast_ex_trace(taddr, (int)opc & MO_SIZE, s->mmu_idx);
 #endif /* QEM_TRACE_ENABLED */
 /*******************************************************************************
  * QEMTrace END
@@ -10026,8 +10093,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
  * QEMTrace START
  ******************************************************************************/
 #if QEM_TRACE_ENABLED
-    gen_qem_datald_trace(taddr, (int)opc & MO_SIZE, s->mmu_idx);
-    gen_qem_datast_trace(taddr, (int)opc & MO_SIZE, s->mmu_idx);
+    gen_qem_datald_ex_trace(taddr, (int)opc & MO_SIZE, s->mmu_idx);
+    gen_qem_datast_ex_trace(taddr, (int)opc & MO_SIZE, s->mmu_idx);
 #endif /* QEM_TRACE_ENABLED */
 /*******************************************************************************
  * QEMTrace END

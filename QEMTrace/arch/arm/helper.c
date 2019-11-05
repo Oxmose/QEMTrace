@@ -109,7 +109,7 @@ void helper_qem_instld_trace(CPUARMState *env, target_ulong current_eip,
 }
 
 void helper_qem_datald_trace(CPUARMState *env, target_ulong addr,
-                             int size, int mmu_idx)
+                             int size, int mmu_idx, int exclusive)
 {
     if(qem_tracing_enabled == 1)
     {
@@ -127,6 +127,10 @@ void helper_qem_datald_trace(CPUARMState *env, target_ulong addr,
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_READ |
                          QEM_TRACE_DATA_TYPE_DATA;
+        if(exclusive)
+        {
+            flags |= QEM_TRACE_EVENT_EXCLUSIVE;
+        }
 
         unsigned a, d;
 
@@ -142,7 +146,7 @@ void helper_qem_datald_trace(CPUARMState *env, target_ulong addr,
 }
 
 void helper_qem_datast_trace(CPUARMState *env, target_ulong addr,
-                             int size, int mmu_idx)
+                             int size, int mmu_idx, int exclusive)
 {
     if(qem_tracing_enabled == 1)
     {
@@ -160,7 +164,10 @@ void helper_qem_datast_trace(CPUARMState *env, target_ulong addr,
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_WRITE |
                          QEM_TRACE_DATA_TYPE_DATA;
-
+        if(exclusive)
+        {
+            flags |= QEM_TRACE_EVENT_EXCLUSIVE;
+        }
         unsigned a, d;
 
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
