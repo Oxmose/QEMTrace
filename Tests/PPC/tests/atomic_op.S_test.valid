@@ -3,8 +3,8 @@ I LD | V 0x00003010 | P 0x00003010 | Core 0 | Time 32653839477496 | RW: R | ID: 
 I LD | V 0x00003014 | P 0x00003014 | Core 0 | Time 32672134630207 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: N | CL: 1 | CI: N | WT: D | EX: N
 I LD | V 0x00003018 | P 0x00003018 | Core 0 | Time 32676560013493 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: N | CL: 1 | CI: N | WT: D | EX: N
 I LD | V 0x0000301c | P 0x0000301c | Core 0 | Time 32680389559275 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: N | CL: 1 | CI: N | WT: D | EX: N
-D LD | V 0x00007000 | P 0x00007000 | Core 0 | Time 32680389632298 | RW: R | ID: D | PL: K | E: A | G: L | S: W | CR: N | CL: 1 | CI: N | WT: D | EX: N
+D LD | V 0x00007000 | P 0x00007000 | Core 0 | Time 32680389632298 | RW: R | ID: D | PL: K | E: A | G: L | S: W | CR: N | CL: 1 | CI: N | WT: D | EX: Y
 I LD | V 0x00003020 | P 0x00003020 | Core 0 | Time 32680389642615 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: N | CL: 1 | CI: N | WT: D | EX: N
-D ST | V 0x00007000 | P 0x00007000 | Core 0 | Time 32680389654309 | RW: W | ID: D | PL: K | E: A | G: L | S: W | CR: N | CL: 1 | CI: N | WT: D | EX: N
+D ST | V 0x00007000 | P 0x00007000 | Core 0 | Time 32680389654309 | RW: W | ID: D | PL: K | E: A | G: L | S: W | CR: N | CL: 1 | CI: N | WT: D | EX: Y
 I LD | V 0x00003024 | P 0x00003024 | Core 0 | Time 32807904507904 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: N | CL: 1 | CI: N | WT: D | EX: N
 I LD | V 0x00003028 | P 0x00003028 | Core 0 | Time 32818776687628 | RW: R | ID: I | PL: K | E: A | G: L | S: W | CR: N | CL: 1 | CI: N | WT: D | EX: N
