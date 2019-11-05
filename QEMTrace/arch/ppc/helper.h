@@ -32,6 +32,8 @@ DEF_HELPER_3(qem_instld_trace, void, env, tl, int)
 
 DEF_HELPER_4(qem_datald_trace, void, env, tl, int, int)
 DEF_HELPER_4(qem_datast_trace, void, env, tl, int, int)
+DEF_HELPER_4(qem_datald_ex_trace, void, env, tl, int, int)
+DEF_HELPER_4(qem_datast_ex_trace, void, env, tl, int, int)
 
 DEF_HELPER_3(qem_datald_trace_direct, void, env, tl, int)
 DEF_HELPER_3(qem_datast_trace_direct, void, env, tl, int)

@@ -237,6 +237,16 @@ void helper_qem_datast_trace(CPUPPCState *env, target_ulong simm,
     }
 }
 
+void helper_qem_datast_ex_trace(CPUPPCState *env, target_ulong simm,
+                         int reg, int size)
+{
+    if(qem_tracing_enabled == 1)
+    {
+        target_ulong virt_addr = env->gpr[reg] + simm;
+        helper_qem_datast_ex_trace_direct(env, virt_addr, size);
+    }
+}
+
 void helper_qem_datast_ex_trace_trad(CPUPPCState *env, int reg0,
                               int reg1, int size)
 {
@@ -265,6 +275,16 @@ void helper_qem_datald_trace(CPUPPCState *env, target_ulong simm,
     {
         target_ulong virt_addr = env->gpr[reg] + simm;
         helper_qem_datald_trace_direct(env, virt_addr, size);
+    }
+}
+
+void helper_qem_datald_ex_trace(CPUPPCState *env, target_ulong simm,
+                         int reg, int size)
+{
+    if(qem_tracing_enabled == 1)
+    {
+        target_ulong virt_addr = env->gpr[reg] + simm;
+        helper_qem_datald_ex_trace_direct(env, virt_addr, size);
     }
 }
 
