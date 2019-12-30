@@ -8,7 +8,7 @@
  ******************************************************************************/
 
 /* Icache flash inval */
-.long 0xFFFFFFF4
+.long 0xFFFFFFF8
 
 /* Dcache flash inval */
-.long 0xFFFFFFF5
+.long 0xFFFFFFF9

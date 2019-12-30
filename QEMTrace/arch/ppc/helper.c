@@ -78,26 +78,33 @@ coherency, size)                                                               \
 void helper_qem_instld_trace(CPUPPCState *env, target_ulong current_eip,
                          int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_ITRACE) != 0)
     {
         /* Get information about the adreess */
         target_ulong haddr;
-        int32_t coherency_enabled;
-        int32_t cache_inhibit;
-        int32_t wt_enable;
-        qem_ppc_get_info_addr_mem_trace(env, current_eip, ACCESS_CODE, &haddr,
-                                    &wt_enable,
-                                    &cache_inhibit, &coherency_enabled);
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_READ |
                          QEM_TRACE_DATA_TYPE_INST;
 
+#if QEM_TRACE_GATHER_META
+
+        int32_t coherency_enabled;
+        int32_t cache_inhibit;
+        int32_t wt_enable;
+
+        qem_ppc_get_info_addr_mem_trace(env, current_eip, ACCESS_CODE, &haddr,
+                                    &wt_enable,
+                                    &cache_inhibit, &coherency_enabled);
+
         unsigned a, d;
 
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
-
+#else 
+    haddr = current_eip;
+#endif
+        
         qem_trace_output(current_eip,
                               haddr,
                               ENV_GET_CPU(env)->cpu_index,
@@ -109,25 +116,31 @@ void helper_qem_instld_trace(CPUPPCState *env, target_ulong current_eip,
 void helper_qem_datast_trace_direct(CPUPPCState *env, target_ulong virt_addr,
                                 int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         /* Get information about the adreess */
         target_ulong haddr;
-        int32_t coherency_enabled;
-        int32_t cache_inhibit;
-        int32_t wt_enable;
-        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
-                                    &wt_enable,
-                                    &cache_inhibit, &coherency_enabled);
+        
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_WRITE |
                          QEM_TRACE_DATA_TYPE_DATA;
 
+#if QEM_TRACE_GATHER_META
+        int32_t coherency_enabled;
+        int32_t cache_inhibit;
+        int32_t wt_enable;
+
+        qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
+                                    &wt_enable,
+                                    &cache_inhibit, &coherency_enabled);
+
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
-
+#else 
+    haddr = virt_addr;
+#endif
         qem_trace_output(virt_addr,
                                 haddr,
                                 ENV_GET_CPU(env)->cpu_index,
@@ -139,10 +152,16 @@ void helper_qem_datast_trace_direct(CPUPPCState *env, target_ulong virt_addr,
 void helper_qem_datast_ex_trace_direct(CPUPPCState *env, target_ulong virt_addr,
                                 int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         /* Get information about the adreess */
         target_ulong haddr;
+
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_WRITE |
+                         QEM_TRACE_DATA_TYPE_DATA | QEM_TRACE_EVENT_EXCLUSIVE;
+
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         int32_t wt_enable;
@@ -150,13 +169,12 @@ void helper_qem_datast_ex_trace_direct(CPUPPCState *env, target_ulong virt_addr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_WRITE |
-                         QEM_TRACE_DATA_TYPE_DATA | QEM_TRACE_EVENT_EXCLUSIVE;
-
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
+#else 
+    haddr = virt_addr;
+#endif
 
         qem_trace_output(virt_addr,
                                 haddr,
@@ -169,10 +187,16 @@ void helper_qem_datast_ex_trace_direct(CPUPPCState *env, target_ulong virt_addr,
 void helper_qem_datald_trace_direct(CPUPPCState *env, target_ulong virt_addr,
                                 int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         /* Get information about the adreess */
         target_ulong haddr;
+
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_READ |
+                         QEM_TRACE_DATA_TYPE_DATA;
+
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         int32_t wt_enable;
@@ -180,13 +204,12 @@ void helper_qem_datald_trace_direct(CPUPPCState *env, target_ulong virt_addr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_READ |
-                         QEM_TRACE_DATA_TYPE_DATA;
-
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
+#else 
+    haddr = virt_addr;
+#endif
 
         qem_trace_output(virt_addr,
                                 haddr,
@@ -199,10 +222,16 @@ void helper_qem_datald_trace_direct(CPUPPCState *env, target_ulong virt_addr,
 void helper_qem_datald_ex_trace_direct(CPUPPCState *env, target_ulong virt_addr,
                                 int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         /* Get information about the adreess */
         target_ulong haddr;
+
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_READ |
+                         QEM_TRACE_DATA_TYPE_DATA | QEM_TRACE_EVENT_EXCLUSIVE;
+
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         int32_t wt_enable;
@@ -210,13 +239,12 @@ void helper_qem_datald_ex_trace_direct(CPUPPCState *env, target_ulong virt_addr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_READ |
-                         QEM_TRACE_DATA_TYPE_DATA | QEM_TRACE_EVENT_EXCLUSIVE;
-
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
+#else 
+    haddr = virt_addr;
+#endif
 
         qem_trace_output(virt_addr,
                                 haddr,
@@ -230,7 +258,7 @@ void helper_qem_datald_ex_trace_direct(CPUPPCState *env, target_ulong virt_addr,
 void helper_qem_datast_trace(CPUPPCState *env, target_ulong simm,
                          int reg, int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg] + simm;
         helper_qem_datast_trace_direct(env, virt_addr, size);
@@ -240,7 +268,7 @@ void helper_qem_datast_trace(CPUPPCState *env, target_ulong simm,
 void helper_qem_datast_ex_trace(CPUPPCState *env, target_ulong simm,
                          int reg, int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg] + simm;
         helper_qem_datast_ex_trace_direct(env, virt_addr, size);
@@ -250,7 +278,7 @@ void helper_qem_datast_ex_trace(CPUPPCState *env, target_ulong simm,
 void helper_qem_datast_ex_trace_trad(CPUPPCState *env, int reg0,
                               int reg1, int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
         helper_qem_datast_ex_trace_direct(env, virt_addr, size);
@@ -261,7 +289,7 @@ void helper_qem_datast_ex_trace_trad(CPUPPCState *env, int reg0,
 void helper_qem_datast_trace_trad(CPUPPCState *env, int reg0,
                               int reg1, int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
         helper_qem_datast_trace_direct(env, virt_addr, size);
@@ -271,7 +299,7 @@ void helper_qem_datast_trace_trad(CPUPPCState *env, int reg0,
 void helper_qem_datald_trace(CPUPPCState *env, target_ulong simm,
                          int reg, int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg] + simm;
         helper_qem_datald_trace_direct(env, virt_addr, size);
@@ -281,7 +309,7 @@ void helper_qem_datald_trace(CPUPPCState *env, target_ulong simm,
 void helper_qem_datald_ex_trace(CPUPPCState *env, target_ulong simm,
                          int reg, int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg] + simm;
         helper_qem_datald_ex_trace_direct(env, virt_addr, size);
@@ -291,7 +319,7 @@ void helper_qem_datald_ex_trace(CPUPPCState *env, target_ulong simm,
 void helper_qem_datald_trace_trad(CPUPPCState *env, int reg0,
                               int reg1, int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
         helper_qem_datald_trace_direct(env, virt_addr, size);
@@ -301,7 +329,7 @@ void helper_qem_datald_trace_trad(CPUPPCState *env, int reg0,
 void helper_qem_datald_ex_trace_trad(CPUPPCState *env, int reg0,
                               int reg1, int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
         helper_qem_datald_ex_trace_direct(env, virt_addr, size);
@@ -310,15 +338,15 @@ void helper_qem_datald_ex_trace_trad(CPUPPCState *env, int reg0,
 
 /*********************************** MISC *************************************/
 
-void helper_qem_start_trace(CPUPPCState *env)
+void helper_qem_start_trace(CPUPPCState *env, int type)
 {
     CPUState *cs = ENV_GET_CPU(env);
-    qem_trace_enable(cs);
+    qem_trace_enable(cs, (QEM_TRACE_TTYPE_E)type);
 }
 
-void helper_qem_stop_trace(void)
+void helper_qem_stop_trace(int type)
 {
-     qem_trace_disable();
+    qem_trace_disable((QEM_TRACE_TTYPE_E)type);
 }
 
 void helper_qem_trace_start_timer(void)
@@ -336,12 +364,19 @@ void helper_qem_trace_get_timer(void)
 void helper_qem_dcache_flush_inval(CPUPPCState *env, int reg0, int reg1, int level,
                                int granularity)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         /* Get information about the adreess */
         target_ulong haddr;
+
+            /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_FLUSH | QEM_TRACE_EVENT_INVALIDATE |
+                         QEM_TRACE_DATA_TYPE_DATA |
+                         (QEM_TRACE_GRANULARITY_E)granularity;
+    
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         uint32_t size = 1;
@@ -349,11 +384,6 @@ void helper_qem_dcache_flush_inval(CPUPPCState *env, int reg0, int reg1, int lev
         qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
-
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_FLUSH | QEM_TRACE_EVENT_INVALIDATE |
-                         QEM_TRACE_DATA_TYPE_DATA |
-                         (QEM_TRACE_GRANULARITY_E)granularity;
 
         switch(level)
         {
@@ -374,6 +404,9 @@ void helper_qem_dcache_flush_inval(CPUPPCState *env, int reg0, int reg1, int lev
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
+#else 
+    haddr = virt_addr;
+#endif
 
         qem_trace_output(virt_addr,
                                 haddr,
@@ -385,12 +418,18 @@ void helper_qem_dcache_flush_inval(CPUPPCState *env, int reg0, int reg1, int lev
 void helper_qem_dcache_inval(CPUPPCState *env, int reg0, int reg1, int level,
                          int granularity)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         /* Get information about the adreess */
         target_ulong haddr;
+
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_INVALIDATE |
+                         QEM_TRACE_DATA_TYPE_DATA |
+                         (QEM_TRACE_GRANULARITY_E)granularity;
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         uint32_t size = 1;
@@ -398,11 +437,6 @@ void helper_qem_dcache_inval(CPUPPCState *env, int reg0, int reg1, int level,
         qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
-
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_INVALIDATE |
-                         QEM_TRACE_DATA_TYPE_DATA |
-                         (QEM_TRACE_GRANULARITY_E)granularity;
 
          switch(level)
          {
@@ -423,6 +457,9 @@ void helper_qem_dcache_inval(CPUPPCState *env, int reg0, int reg1, int level,
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
+#else 
+    haddr = virt_addr;
+#endif
 
         qem_trace_output(virt_addr,
                                 haddr,
@@ -434,12 +471,18 @@ void helper_qem_dcache_inval(CPUPPCState *env, int reg0, int reg1, int level,
 void helper_qem_dcache_flush(CPUPPCState *env, int reg0, int reg1, int level,
                          int granularity, int exclusive)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         /* Get information about the adreess */
         target_ulong haddr;
+
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_FLUSH |
+                         QEM_TRACE_DATA_TYPE_DATA |
+                         (QEM_TRACE_GRANULARITY_E)granularity;
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         uint32_t size = 1;
@@ -447,11 +490,6 @@ void helper_qem_dcache_flush(CPUPPCState *env, int reg0, int reg1, int level,
         qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
-
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_FLUSH |
-                         QEM_TRACE_DATA_TYPE_DATA |
-                         (QEM_TRACE_GRANULARITY_E)granularity;
 
         if(exclusive == 1)
         {
@@ -477,6 +515,9 @@ void helper_qem_dcache_flush(CPUPPCState *env, int reg0, int reg1, int level,
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
+#else 
+    haddr = virt_addr;
+#endif
 
         qem_trace_output(virt_addr,
                                 haddr,
@@ -489,11 +530,17 @@ void helper_qem_dcache_prefetch_non_inibited(CPUPPCState *env, int reg0, int reg
                                          int level, int granularity,
                                          int exclusive)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         target_ulong haddr;
+
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_PREFETCH | QEM_TRACE_ACCESS_TYPE_READ |
+                         QEM_TRACE_DATA_TYPE_DATA;
+
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         int32_t wt_enable;
@@ -501,10 +548,6 @@ void helper_qem_dcache_prefetch_non_inibited(CPUPPCState *env, int reg0, int reg
         qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
-
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_PREFETCH | QEM_TRACE_ACCESS_TYPE_READ |
-                         QEM_TRACE_DATA_TYPE_DATA;
 
         if(exclusive == 1)
         {
@@ -514,6 +557,9 @@ void helper_qem_dcache_prefetch_non_inibited(CPUPPCState *env, int reg0, int reg
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
+#else 
+    haddr = virt_addr;
+#endif
 
         qem_trace_output(virt_addr,
                                 haddr,
@@ -525,12 +571,18 @@ void helper_qem_dcache_prefetch_non_inibited(CPUPPCState *env, int reg0, int reg
 void helper_qem_dcache_lock(CPUPPCState *env, int reg0, int reg1, int level,
                         int granularity, int exclusive)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         /* Get information about the adreess */
         target_ulong haddr;
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_LOCK |
+                         QEM_TRACE_DATA_TYPE_DATA |
+                         (QEM_TRACE_GRANULARITY_E)granularity;
+
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         uint32_t size = 1;
@@ -539,10 +591,6 @@ void helper_qem_dcache_lock(CPUPPCState *env, int reg0, int reg1, int level,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_LOCK |
-                         QEM_TRACE_DATA_TYPE_DATA |
-                         (QEM_TRACE_GRANULARITY_E)granularity;
         if(exclusive == 1)
         {
             flags |= QEM_TRACE_EVENT_EXCLUSIVE;
@@ -566,6 +614,9 @@ void helper_qem_dcache_lock(CPUPPCState *env, int reg0, int reg1, int level,
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
+#else 
+    haddr = virt_addr;
+#endif
 
         qem_trace_output(virt_addr,
                                 haddr,
@@ -577,12 +628,17 @@ void helper_qem_dcache_lock(CPUPPCState *env, int reg0, int reg1, int level,
 void helper_qem_dcache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
                           int granularity)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         /* Get information about the adreess */
         target_ulong haddr;
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_UNLOCK |
+                         QEM_TRACE_DATA_TYPE_DATA |
+                         (QEM_TRACE_GRANULARITY_E)granularity;
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         uint32_t size = 1;
@@ -590,11 +646,6 @@ void helper_qem_dcache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
         qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_INT, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
-
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_UNLOCK |
-                         QEM_TRACE_DATA_TYPE_DATA |
-                         (QEM_TRACE_GRANULARITY_E)granularity;
 
         switch(level)
         {
@@ -615,7 +666,9 @@ void helper_qem_dcache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
-
+#else 
+    haddr = virt_addr;
+#endif
         qem_trace_output(virt_addr,
                                 haddr,
                                 ENV_GET_CPU(env)->cpu_index,
@@ -626,12 +679,17 @@ void helper_qem_dcache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
 void helper_qem_icache_inval(CPUPPCState *env, int reg0, int reg1, int level,
                          int granularity)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_ITRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         /* Get information about the adreess */
         target_ulong haddr;
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_INVALIDATE |
+                         QEM_TRACE_DATA_TYPE_INST |
+                         (QEM_TRACE_GRANULARITY_E)granularity;
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         uint32_t size = 1;
@@ -639,11 +697,6 @@ void helper_qem_icache_inval(CPUPPCState *env, int reg0, int reg1, int level,
         qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
-
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_INVALIDATE |
-                         QEM_TRACE_DATA_TYPE_INST |
-                         (QEM_TRACE_GRANULARITY_E)granularity;
 
          switch(level)
          {
@@ -664,7 +717,9 @@ void helper_qem_icache_inval(CPUPPCState *env, int reg0, int reg1, int level,
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
-
+#else 
+    haddr = virt_addr;
+#endif
         qem_trace_output(virt_addr,
                                 haddr,
                                 ENV_GET_CPU(env)->cpu_index,
@@ -675,12 +730,17 @@ void helper_qem_icache_inval(CPUPPCState *env, int reg0, int reg1, int level,
 void helper_qem_icache_flush(CPUPPCState *env, int reg0, int reg1, int level,
                          int granularity)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_ITRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         /* Get information about the adreess */
         target_ulong haddr;
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_FLUSH |
+                         QEM_TRACE_DATA_TYPE_INST |
+                         (QEM_TRACE_GRANULARITY_E)granularity;
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         uint32_t size = 1;
@@ -688,11 +748,6 @@ void helper_qem_icache_flush(CPUPPCState *env, int reg0, int reg1, int level,
         qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
-
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_FLUSH |
-                         QEM_TRACE_DATA_TYPE_INST |
-                         (QEM_TRACE_GRANULARITY_E)granularity;
 
          switch(level)
          {
@@ -713,7 +768,9 @@ void helper_qem_icache_flush(CPUPPCState *env, int reg0, int reg1, int level,
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
-
+#else 
+    haddr = virt_addr;
+#endif
         qem_trace_output(virt_addr,
                                 haddr,
                                 ENV_GET_CPU(env)->cpu_index,
@@ -724,12 +781,18 @@ void helper_qem_icache_flush(CPUPPCState *env, int reg0, int reg1, int level,
 void helper_qem_icache_lock(CPUPPCState *env, int reg0, int reg1, int level,
                         int granularity, int exclusive)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_ITRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         /* Get information about the adreess */
         target_ulong haddr;
+
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_LOCK |
+                         QEM_TRACE_DATA_TYPE_INST |
+                         (QEM_TRACE_GRANULARITY_E)granularity;
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         uint32_t size = 1;
@@ -737,11 +800,6 @@ void helper_qem_icache_lock(CPUPPCState *env, int reg0, int reg1, int level,
         qem_ppc_get_info_addr_mem_trace(env, virt_addr, ACCESS_CODE, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
-
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_LOCK |
-                         QEM_TRACE_DATA_TYPE_INST |
-                         (QEM_TRACE_GRANULARITY_E)granularity;
 
         if(exclusive == 1)
         {
@@ -767,7 +825,9 @@ void helper_qem_icache_lock(CPUPPCState *env, int reg0, int reg1, int level,
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
-
+#else 
+    haddr = virt_addr;
+#endif
         qem_trace_output(virt_addr,
                                 haddr,
                                 ENV_GET_CPU(env)->cpu_index,
@@ -779,12 +839,17 @@ void helper_qem_icache_lock(CPUPPCState *env, int reg0, int reg1, int level,
 void helper_qem_icache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
                           int granularity)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_ITRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         /* Get information about the adreess */
         target_ulong haddr;
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_UNLOCK |
+                         QEM_TRACE_DATA_TYPE_INST |
+                         (QEM_TRACE_GRANULARITY_E)granularity;
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         uint32_t size = 1;
@@ -793,10 +858,6 @@ void helper_qem_icache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_UNLOCK |
-                         QEM_TRACE_DATA_TYPE_INST |
-                         (QEM_TRACE_GRANULARITY_E)granularity;
         switch(level)
         {
              case 0:
@@ -816,7 +877,9 @@ void helper_qem_icache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
-
+#else 
+    haddr = virt_addr;
+#endif
         qem_trace_output(virt_addr,
                                 haddr,
                                 ENV_GET_CPU(env)->cpu_index,
@@ -827,7 +890,7 @@ void helper_qem_icache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
 
 void helper_qem_icbt(CPUPPCState *env, int reg0, int reg1, int level)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_ITRACE) != 0)
     {
         
         /* ICBT acts like a load only on CT = 1 */
@@ -839,6 +902,12 @@ void helper_qem_icbt(CPUPPCState *env, int reg0, int reg1, int level)
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         target_ulong haddr;
+
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_PREFETCH | QEM_TRACE_ACCESS_TYPE_READ |
+                         QEM_TRACE_DATA_TYPE_INST | QEM_TRACE_CACHE_LEVEL_2;
+
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         int32_t wt_enable;
@@ -848,14 +917,12 @@ void helper_qem_icbt(CPUPPCState *env, int reg0, int reg1, int level)
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_PREFETCH | QEM_TRACE_ACCESS_TYPE_READ |
-                         QEM_TRACE_DATA_TYPE_INST | QEM_TRACE_CACHE_LEVEL_2;
-
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
-
+#else 
+    haddr = virt_addr;
+#endif
         qem_trace_output(virt_addr,
                                 haddr,
                                 ENV_GET_CPU(env)->cpu_index,
@@ -866,12 +933,16 @@ void helper_qem_icbt(CPUPPCState *env, int reg0, int reg1, int level)
 
 void helper_qem_dcbz_trace_trad(CPUPPCState *env, int reg0, int reg1, int size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         /* Get information about the adreess */
         target_ulong haddr;
+        /* Set flags */
+        uint32_t flags = QEM_TRACE_EVENT_DCBZ | QEM_TRACE_ACCESS_TYPE_READ |
+                         QEM_TRACE_DATA_TYPE_DATA;
+#if QEM_TRACE_GATHER_META
         int32_t coherency_enabled;
         int32_t cache_inhibit;
         int32_t wt_enable;
@@ -879,14 +950,12 @@ void helper_qem_dcbz_trace_trad(CPUPPCState *env, int reg0, int reg1, int size)
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        /* Set flags */
-        uint32_t flags = QEM_TRACE_EVENT_DCBZ | QEM_TRACE_ACCESS_TYPE_READ |
-                         QEM_TRACE_DATA_TYPE_DATA;
-
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
-
+#else 
+    haddr = virt_addr;
+#endif
         qem_trace_output(virt_addr,
                                 haddr,
                                 ENV_GET_CPU(env)->cpu_index,
@@ -897,26 +966,30 @@ void helper_qem_dcbz_trace_trad(CPUPPCState *env, int reg0, int reg1, int size)
 
 void helper_qem_flash_inval_icache(CPUPPCState *env)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_ITRACE) != 0)
     {
         target_ulong virt_addr = 0;
 
         /* Get information about the adreess */
         target_ulong haddr = 0;
-        int32_t coherency_enabled = 0;
-        int32_t cache_inhibit = 0;
-        uint32_t size = 1;
-        int32_t wt_enable = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_INVALIDATE |
                          QEM_TRACE_DATA_TYPE_INST |
                          QEM_TRACE_GRANULARITY_GLOBAL | QEM_TRACE_CACHE_LEVEL_1;
+#if QEM_TRACE_GATHER_META
+        int32_t coherency_enabled = 0;
+        int32_t cache_inhibit = 0;
+        uint32_t size = 1;
+        int32_t wt_enable = 0;
+
 
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
-
+#else 
+    haddr = virt_addr;
+#endif
         qem_trace_output(virt_addr,
                                 haddr,
                                 ENV_GET_CPU(env)->cpu_index,
@@ -927,26 +1000,30 @@ void helper_qem_flash_inval_icache(CPUPPCState *env)
 
 void helper_qem_flash_inval_dcache(CPUPPCState *env)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong virt_addr = 0;
 
         /* Get information about the adreess */
         target_ulong haddr = 0;
-        int32_t coherency_enabled = 0;
-        int32_t cache_inhibit = 0;
-        uint32_t size = 1;
-        int32_t wt_enable = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_INVALIDATE |
                          QEM_TRACE_DATA_TYPE_DATA |
                          QEM_TRACE_GRANULARITY_GLOBAL | QEM_TRACE_CACHE_LEVEL_1;
+#if QEM_TRACE_GATHER_META
+        int32_t coherency_enabled = 0;
+        int32_t cache_inhibit = 0;
+        uint32_t size = 1;
+        int32_t wt_enable = 0;
+
 
         unsigned a, d;
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
-
+#else 
+    haddr = virt_addr;
+#endif
         qem_trace_output(virt_addr,
                                 haddr,
                                 ENV_GET_CPU(env)->cpu_index,

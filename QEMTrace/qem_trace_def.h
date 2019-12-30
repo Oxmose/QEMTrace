@@ -33,6 +33,16 @@
  * STRUCTURES AND MASKS
  ******************************************************************************/
 
+/* Tracing types */
+typedef enum 
+{
+    QEM_TRACE_DTRACE    = 0x01,
+    QEM_TRACE_ITRACE    = 0x02,
+
+    /* MUST be equal to (QEM_TRACE_DTRACE | QEM_TRACE_ITRACE) */
+    QEM_TRACE_ALLTRACE  = 0x03 
+} QEM_TRACE_TTYPE_E;
+
 /* Tracing acces types, if the access is a read or a write */
 typedef enum
 {

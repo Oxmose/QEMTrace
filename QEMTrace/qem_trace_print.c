@@ -39,7 +39,7 @@
  * GLOBAL VARS
  ******************************************************************************/
 /* Keeps track on the tracing state */
-volatile uint32_t qem_tracing_enabled = 0;
+volatile uint8_t qem_tracing_state = 0;
 
 /* Keeps track execution time */
 volatile uint64_t qem_time_start = 0;
@@ -48,16 +48,16 @@ volatile uint64_t qem_time_start = 0;
  * FUNCTIONS
  ******************************************************************************/
 
-void qem_trace_enable(CPUState* cs)
+void qem_trace_enable(CPUState* cs, const QEM_TRACE_TTYPE_E type)
 {
     /* Enable tracing state */
-    qem_tracing_enabled = 1;
+    qem_tracing_state = type;
 }
 
-void qem_trace_disable(void)
+void qem_trace_disable(const QEM_TRACE_TTYPE_E type)
 {
     /* Enable tracing state */
-    qem_tracing_enabled = 0;
+    qem_tracing_state &= ~type;
 }
 
 void qem_trace_start_timer(void)

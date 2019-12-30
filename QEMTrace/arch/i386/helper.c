@@ -55,7 +55,7 @@ static void flatview_read(FlatView *fv, hwaddr addr,
 
 void helper_qem_instld_trace(CPUX86State *env, target_ulong current_eip, int size)
 {
-     if(qem_tracing_enabled == 1)
+     if((qem_tracing_state & QEM_TRACE_ITRACE) != 0)
      {
         uint32_t l1, l2;
         uint32_t pgd, pde, pte;
@@ -158,7 +158,7 @@ void helper_qem_instld_trace(CPUX86State *env, target_ulong current_eip, int siz
 void helper_qem_datald_trace(CPUArchState *env, target_ulong addr,
                          int32_t data_size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         uint32_t cache_inhibit;
         /* Get the physical address corresponding to the virtual address */
@@ -195,7 +195,7 @@ void helper_qem_datald_trace(CPUArchState *env, target_ulong addr,
 void helper_qem_datast_trace(CPUArchState *env, target_ulong addr,
                          int32_t data_size)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         uint32_t cache_inhibit;
 #if QEM_TRACE_PHYSICAL_ADDRESS
@@ -231,15 +231,15 @@ void helper_qem_datast_trace(CPUArchState *env, target_ulong addr,
 
 /*********************************** MISC *************************************/
 
-void helper_qem_start_trace(CPUX86State *env)
+void helper_qem_start_trace(CPUX86State *env, int type)
 {
     CPUState *cs = ENV_GET_CPU(env);
-    qem_trace_enable(cs);
+    qem_trace_enable(cs, (QEM_TRACE_TTYPE_E)type);
 }
 
-void helper_qem_stop_trace(void)
+void helper_qem_stop_trace(int type)
 {
-     qem_trace_disable();
+     qem_trace_disable((QEM_TRACE_TTYPE_E)type);
 }
 
 void helper_qem_trace_start_timer(void)

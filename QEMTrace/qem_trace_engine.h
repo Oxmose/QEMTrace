@@ -70,7 +70,7 @@ typedef struct qem_trace_header
 }__attribute__((packed)) qem_trace_header_t;
 
 /* Keeps track on the tracing state */
-extern volatile uint32_t qem_tracing_enabled;
+extern volatile uint8_t qem_tracing_state;
 
 /* Keeps track execution time */
 extern volatile uint64_t qem_time_start;
@@ -84,11 +84,17 @@ extern volatile uint64_t qem_time_start;
  * hidding memory access.
  *
  * @param cs The current CPU state, used to flush the software TLB.
+ * @param type The trace type. This parameter is used to know if data, 
+ * instructions or both should be traced.
  */
-void qem_trace_enable(CPUState* cs);
+void qem_trace_enable(CPUState* cs, const QEM_TRACE_TTYPE_E type);
 
-/* Disables Qemu guest memory accesses tracing. */
-void qem_trace_disable(void);
+/* Disables Qemu guest memory accesses tracing.
+ *
+ * @param type The trace type. This parameter is used to know if data, 
+ * instructions or both should not be traced anymore.
+ */
+void qem_trace_disable(const QEM_TRACE_TTYPE_E type);
 
 /* Starts emulation time counter */
 void qem_trace_start_timer(void);

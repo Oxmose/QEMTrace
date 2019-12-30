@@ -8875,15 +8875,48 @@ static void ppc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
     uint32_t custom_inst = 0;
     /* Check if the instruction is a custom Qemu trace code */
     /* Start tracing opcode */
+
     if(ctx->opcode == QEM_TRACE_START_OP)
     {
-        gen_helper_qem_start_trace(cpu_env);
+        TCGv_i32 t0 = tcg_const_i32(QEM_TRACE_ALLTRACE);
+        gen_helper_qem_start_trace(cpu_env, t0);
+        tcg_temp_free_i32(t0);
+        custom_inst = 1;
+    }
+    else if(ctx->opcode == QEM_TRACE_DSTART_OP)
+    {
+        TCGv_i32 t0 = tcg_const_i32(QEM_TRACE_DTRACE);
+        gen_helper_qem_start_trace(cpu_env, t0);
+        tcg_temp_free_i32(t0);
+        custom_inst = 1;
+    }
+    else if(ctx->opcode == QEM_TRACE_ISTART_OP)
+    {
+        TCGv_i32 t0 = tcg_const_i32(QEM_TRACE_ITRACE);
+        gen_helper_qem_start_trace(cpu_env, t0);
+        tcg_temp_free_i32(t0);
         custom_inst = 1;
     }
     /* Stop tracing opcode */
     else if(ctx->opcode == QEM_TRACE_STOP_OP)
     {
-        gen_helper_qem_stop_trace();
+        TCGv_i32 t0 = tcg_const_i32(QEM_TRACE_ALLTRACE);
+        gen_helper_qem_stop_trace(t0);
+        tcg_temp_free_i32(t0);
+        custom_inst = 1;
+    }
+    else if(ctx->opcode == QEM_TRACE_DSTOP_OP)
+    {
+        TCGv_i32 t0 = tcg_const_i32(QEM_TRACE_DTRACE);
+        gen_helper_qem_stop_trace(t0);
+        tcg_temp_free_i32(t0);
+        custom_inst = 1;
+    }
+    else if(ctx->opcode == QEM_TRACE_ISTOP_OP)
+    {
+        TCGv_i32 t0 = tcg_const_i32(QEM_TRACE_ITRACE);
+        gen_helper_qem_stop_trace(t0);
+        tcg_temp_free_i32(t0);
         custom_inst = 1;
     }
     /* Start time point opcode */

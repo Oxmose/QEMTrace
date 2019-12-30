@@ -42,7 +42,7 @@
  * GLOBAL VARS
  ******************************************************************************/
 /* Keeps track on the tracing state */
-volatile uint32_t qem_tracing_enabled = 0;
+volatile uint8_t qem_tracing_state = 0;
 
 /* Keeps track execution time */
 volatile uint64_t qem_time_start = 0;
@@ -234,32 +234,39 @@ static void* qem_trace_flush_routine(void* arg)
     return NULL;
 }
 
-void qem_trace_enable(CPUState* cs)
+void qem_trace_enable(CPUState* cs, const QEM_TRACE_TTYPE_E type)
 {
-    if(qem_tracing_enabled == 1)
+    if(qem_tracing_state == type)
     {
         return;
     }
 
-    /* Enable tracing state */
-    qem_tracing_enabled = 1;
+    if(qem_tracing_state == 0)
+    {
+        /* Open output file */
+        qem_init_tracing();
+    }
 
-    /* Open output file */
-    qem_init_tracing();
+    /* Enable tracing state */
+    qem_tracing_state = type;
+    
 }
 
-void qem_trace_disable(void)
+void qem_trace_disable(const QEM_TRACE_TTYPE_E type)
 {
-    if(qem_tracing_enabled == 0)
+    if(qem_tracing_state == 0)
     {
         return;
     }
 
     /* Enable tracing state */
-    qem_tracing_enabled = 0;
+    qem_tracing_state &= ~type;
 
-    /* Close output file or stream */
-    qem_close_tracing();
+    if(qem_tracing_state == 0)
+    {
+        /* Close output file or stream */
+        qem_close_tracing();
+    }
 }
 
 void qem_trace_start_timer(void)

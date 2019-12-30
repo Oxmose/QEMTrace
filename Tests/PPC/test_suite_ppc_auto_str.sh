@@ -101,7 +101,7 @@ do
         diff newfile filtered_file >> /dev/null
         val=$?
 
-        rm filtered_file newfile diff_file
+        
 
     } &> /dev/null
 
@@ -109,9 +109,12 @@ do
     then
         echo -e "\e[31mERROR \e[39m"
         error0=$(($error0 + 1))
+        exit 1
     else
         echo -e "\e[92mPASSED\e[39m"
     fi
+
+    rm filtered_file newfile diff_file
 done
 echo ""
 if (( $error0 != 0 ))

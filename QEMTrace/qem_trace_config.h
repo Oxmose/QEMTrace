@@ -38,10 +38,16 @@
  *****************************/
 #define QEM_TRACE_START_OP          0xFFFFFFF0
 #define QEM_TRACE_STOP_OP           0xFFFFFFF1
-#define QEM_TRACE_START_TIMER_OP    0xFFFFFFF2
-#define QEM_TRACE_GET_TIMER_OP      0xFFFFFFF3
-#define QEM_TRACE_FLASH_INV_INST_OP 0xFFFFFFF4
-#define QEM_TRACE_FLASH_INV_DATA_OP 0xFFFFFFF5
+#define QEM_TRACE_DSTART_OP         0xFFFFFFF2
+#define QEM_TRACE_DSTOP_OP          0xFFFFFFF3
+#define QEM_TRACE_ISTART_OP         0xFFFFFFF4
+#define QEM_TRACE_ISTOP_OP          0xFFFFFFF5
+
+#define QEM_TRACE_START_TIMER_OP    0xFFFFFFF6
+#define QEM_TRACE_GET_TIMER_OP      0xFFFFFFF7
+
+#define QEM_TRACE_FLASH_INV_INST_OP 0xFFFFFFF8
+#define QEM_TRACE_FLASH_INV_DATA_OP 0xFFFFFFF9
     
 /******************************
  * Trace type 
@@ -51,7 +57,7 @@
 #define QEM_TRACE_SMI   2
 
 /* Select the trace type */
-#define QEM_TRACE_TYPE QEM_TRACE_PRINT
+#define QEM_TRACE_TYPE QEM_TRACE_SMI
 
 /* Modify this value depending on the system you want to trace
  * 0 = 32 Bits target
@@ -69,14 +75,19 @@
  */
 #define QEM_TRACE_PHYSICAL_ADDRESS 1
 
-/* TODO add data, instruction tracing config */
+/* Set this value to 0 if you do not want metadata to be gathered during tracing.
+ * Only the trace type will be stored.
+ * 1 = Metadata gathering enabled
+ * 0 = Metadata gathering disabled
+ */
+#define QEM_TRACE_GATHER_META 1
 
 /******************************
  * Trace buffers 
  *****************************/
 
 /* Size of the trace file buffer in number of entries */
-#define QEM_TRACE_BUFFER_SIZE 100
+#define QEM_TRACE_BUFFER_SIZE 10000
 
 /* Define the multi threaded buffer state */
 #define QEM_TRACE_MT_BUFFER_EN 1

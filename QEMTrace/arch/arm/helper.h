@@ -33,7 +33,7 @@ DEF_HELPER_4(qem_instld_trace, void, env, tl, int, int)
 DEF_HELPER_5(qem_datald_trace, void, env, tl, int, int, int)
 DEF_HELPER_5(qem_datast_trace, void, env, tl, int, int, int)
 
-DEF_HELPER_1(qem_start_trace, void, env)
-DEF_HELPER_0(qem_stop_trace, void)
+DEF_HELPER_2(qem_start_trace, void, env, int)
+DEF_HELPER_1(qem_stop_trace, void, int)
 
 #endif /* QEM_TRACE_ENABLED */

@@ -45,8 +45,8 @@ DEF_HELPER_4(qem_datast_trace_trad, void, env, int, int, int)
 DEF_HELPER_4(qem_datald_ex_trace_trad, void, env, int, int, int)
 DEF_HELPER_4(qem_datast_ex_trace_trad, void, env, int, int, int)
 
-DEF_HELPER_1(qem_start_trace, void, env)
-DEF_HELPER_0(qem_stop_trace, void)
+DEF_HELPER_2(qem_start_trace, void, env, int)
+DEF_HELPER_1(qem_stop_trace, void, int)
 
 DEF_HELPER_0(qem_trace_start_timer, void)
 DEF_HELPER_0(qem_trace_get_timer, void)

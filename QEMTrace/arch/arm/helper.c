@@ -78,7 +78,7 @@ coherency, size, mode)                                                         \
 void helper_qem_instld_trace(CPUARMState *env, target_ulong current_eip,
                              int size, int mmu_idx)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_ITRACE) != 0)
     {
         target_ulong hwaddr;
         int32_t coherency_enabled;
@@ -111,7 +111,7 @@ void helper_qem_instld_trace(CPUARMState *env, target_ulong current_eip,
 void helper_qem_datald_trace(CPUARMState *env, target_ulong addr,
                              int size, int mmu_idx, int exclusive)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong hwaddr;
         int32_t coherency_enabled;
@@ -148,7 +148,7 @@ void helper_qem_datald_trace(CPUARMState *env, target_ulong addr,
 void helper_qem_datast_trace(CPUARMState *env, target_ulong addr,
                              int size, int mmu_idx, int exclusive)
 {
-    if(qem_tracing_enabled == 1)
+    if((qem_tracing_state & QEM_TRACE_DTRACE) != 0)
     {
         target_ulong hwaddr;
         int32_t coherency_enabled;
@@ -183,14 +183,14 @@ void helper_qem_datast_trace(CPUARMState *env, target_ulong addr,
 
 /*********************************** MISC *************************************/
 
-void helper_qem_start_trace(CPUARMState *env)
+void helper_qem_start_trace(CPUARMState *env, int type)
 {
     CPUState *cs = ENV_GET_CPU(env);
-    qem_trace_enable(cs);
+    qem_trace_enable(cs, (QEM_TRACE_TTYPE_E)type);
 }
 
-void helper_qem_stop_trace(void)
+void helper_qem_stop_trace(int type)
 {
-    qem_trace_disable();
+    qem_trace_disable((QEM_TRACE_TTYPE_E)type);
 }
 #endif /* QEM_TRACE_ENABLED */

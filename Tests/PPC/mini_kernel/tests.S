@@ -13,25 +13,23 @@ stwu sp, -16(sp)
 .long 0xFFFFFFF0
 /* Tests will be cat here */
 /*******************************************************************************
- * instruction_tracing.S
+ * wt_state_trace.S
  *
  * Author  Alexy Torres Aurora Dugo
  * Version 1.0
  *
- * MiniKernel test: Check if all instruction are correctly traced even when
- * repeated.
+ * MiniKernel test: Check the tracing on WT enabled addresses.
  ******************************************************************************/
+ 
+lis r3, 0x0001
+addi r3, r3, 0x1000
 
-/* 4 + 4 * 500 + 1 = 2005 */
- li r3, 5
- li r3, 5
- li r3, 5
- li r3, 500
- inst_tracing_loop:
-     addi r3, r3, -1
-     li r4, 5
-     cmpi 0,0,r3,0 /* Compare r3 with 0, cr0 bit 2 is set on equality */
-     bne cr0, inst_tracing_loop
+/* WT enabled */
+lwz r4, 0(r3)
+
+lis r3, 0x0001
+/* WT disabled */
+lwz r4, 0(r3)
 /* EP */
 /* Disable tracing: 0xFFFFFFF1 */
 .long 0xFFFFFFF1
