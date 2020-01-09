@@ -11,6 +11,12 @@ Such information can be used to precisely profile memory usage or access pattern
 ## Build status
 Last build: [![Build Status](https://travis-ci.com/Oxmose/QEMTrace.svg?token=FemmxkqNFEyYqtL2nUhs&branch=master)](https://travis-ci.com/Oxmose/QEMTrace)
 
+## Supported architectures
+* x86 (i386 and x86_64)
+* PowerPC (tested on e200, e500 and e6500)
+* ARMv7
+* RISC-V (in progress)
+
 ## Features
 - Fully customizable memory tracing
 - Multiple trace format
