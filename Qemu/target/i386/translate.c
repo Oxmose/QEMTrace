@@ -32,6 +32,15 @@
 #include "trace-tcg.h"
 #include "exec/log.h"
 
+/*******************************************************************************
+ * QEMTrace START
+ ******************************************************************************/
+#include "../../QEMTrace/qem_trace_engine.h"
+#include "../../QEMTrace/qem_trace_config.h"
+/*******************************************************************************
+ * QEMTrace END
+ ******************************************************************************/
+
 #define PREFIX_REPZ   0x01
 #define PREFIX_REPNZ  0x02
 #define PREFIX_LOCK   0x04
@@ -4708,6 +4717,8 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
     s->aflag = aflag;
     s->dflag = dflag;
 
+    TCGv_i32 tmptrace;
+
     /* now check op code */
  reswitch:
     switch(b) {
@@ -4725,14 +4736,53 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
         /* Consume next two bytes */
         b = x86_ldub_code(env, s);
         b = x86_ldub_code(env, s);
-        gen_helper_qem_start_trace(cpu_env);
+        tmptrace = tcg_const_i32(QEM_TRACE_ALLTRACE);
+        gen_helper_qem_start_trace(cpu_env, tmptrace);
+        tcg_temp_free_i32(tmptrace);
         break;
     case 0x1A7: /* Stop mem tracing custom instruction */
         /* Consume next two bytes */
         b = x86_ldub_code(env, s);
         b = x86_ldub_code(env, s);
-        gen_helper_qem_stop_trace();
+        tmptrace = tcg_const_i32(QEM_TRACE_ALLTRACE);
+        gen_helper_qem_stop_trace(tmptrace);
+        tcg_temp_free_i32(tmptrace);
         break;
+ /* TODO Update tracing point */
+ #if 0
+    case 0x1A8: /* Start mem tracing custom instruction */
+        /* Consume next two bytes */
+        b = x86_ldub_code(env, s);
+        b = x86_ldub_code(env, s);
+        tmptrace = tcg_const_i32(QEM_TRACE_ITRACE);
+        gen_helper_qem_start_trace(cpu_env, tmptrace);
+        tcg_temp_free_i32(tmptrace);
+        break;
+    case 0x1A9: /* Stop mem tracing custom instruction */
+        /* Consume next two bytes */
+        b = x86_ldub_code(env, s);
+        b = x86_ldub_code(env, s);
+        tmptrace = tcg_const_i32(QEM_TRACE_ITRACE);
+        gen_helper_qem_stop_trace(tmptrace);
+        tcg_temp_free_i32(tmptrace);
+        break;
+    case 0x1AA: /* Start mem tracing custom instruction */
+        /* Consume next two bytes */
+        b = x86_ldub_code(env, s);
+        b = x86_ldub_code(env, s);
+        tmptrace = tcg_const_i32(QEM_TRACE_DTRACE);
+        gen_helper_qem_start_trace(cpu_env, tmptrace);
+        tcg_temp_free_i32(tmptrace);
+        break;
+    case 0x1AB: /* Stop mem tracing custom instruction */
+        /* Consume next two bytes */
+        b = x86_ldub_code(env, s);
+        b = x86_ldub_code(env, s);
+        tmptrace = tcg_const_i32(QEM_TRACE_DTRACE);
+        gen_helper_qem_stop_trace(tmptrace);
+        tcg_temp_free_i32(tmptrace);
+        break;
+#endif
     case 0x17A: /* Start counter custom instruction */
         /* Consume next two bytes */
         b = x86_ldub_code(env, s);
