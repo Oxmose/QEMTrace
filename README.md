@@ -26,10 +26,33 @@ Such information can be used to precisely profile memory usage or access pattern
 - Cache instructions support
 
 ## How to use QEMTrace
-Todo: 
-* Add documentation on compiling
-* Add documentation on pre compile configuration
-* Add documentation on use
+
+QEMU is multi-platform software intended to be buildable on all modern
+Linux platforms, OS-X, Win32 (via the Mingw64 toolchain) and a variety
+of other UNIX targets. The simple steps to build QEMU are:
+
+  mkdir build
+  cd build
+  ../configure
+  make
+
+Additional information can also be found online via the QEMU website:
+
+  https://qemu.org/Hosts/Linux
+  https://qemu.org/Hosts/Mac
+  https://qemu.org/Hosts/W32
+
+## Contact
+
+For any QEMTrace related question, please contact:
+alexy.torres-aurora-dugo@polymtl.ca
+
+The QEMU community can be contacted in a number of ways, with the two
+main methods being email and IRC
+
+ - qemu-devel@nongnu.org
+   https://lists.nongnu.org/mailman/listinfo/qemu-devel
+ - #qemu on irc.oftc.net
 
 ## Publication
 Todo: Publication link
