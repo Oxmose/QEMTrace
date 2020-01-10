@@ -332,14 +332,19 @@ void qem_trace_output(uint32_t virt_addr, uint32_t phys_addr,
         /* Switch current buffer */
         qem_trace_current_buffer = (qem_trace_current_buffer + 1) % 2;
      }
-
+#if QEM_TRACE_GATHER_META
      /* Create the structure */
      qem_trace_t new_trace = {
          .address = phys_addr,
          .timestamp = time,
          .flags = (core & 0xFF) | (flags & 0xFFFFFF00)
      };
-
+#else 
+    qem_trace_t new_trace = {
+         .address = phys_addr,
+         .flags = (uint8_t)flags
+     };
+#endif
      /* Copy the structure to the buffer */
      uint64_t offset = qem_trace_buffer_sizes[qem_trace_current_buffer] * 
                        sizeof(qem_trace_t);

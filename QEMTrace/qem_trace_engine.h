@@ -45,6 +45,7 @@
  * STRUCTURES
  ******************************************************************************/
 
+#if QEM_TRACE_GATHER_META
 #if QEM_TRACE_TARGET_64
 typedef struct qem_trace
 {
@@ -60,6 +61,21 @@ typedef struct qem_trace
     uint32_t  flags;
 }__attribute__((packed)) qem_trace_t;
 #endif
+#else 
+#if QEM_TRACE_TARGET_64
+typedef struct qem_trace
+{
+    uint64_t address;
+    uint8_t  flags;
+}__attribute__((packed)) qem_trace_t;
+#else
+typedef struct qem_trace
+{
+    uint32_t address;
+    uint8_t  flags;
+}__attribute__((packed)) qem_trace_t;
+#endif 
+#endif 
 
 typedef struct qem_trace_header
 {

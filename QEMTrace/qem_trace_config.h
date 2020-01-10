@@ -57,7 +57,7 @@
 #define QEM_TRACE_SMI   2
 
 /* Select the trace type */
-#define QEM_TRACE_TYPE QEM_TRACE_SMI
+#define QEM_TRACE_TYPE QEM_TRACE_FILE
 
 /* Modify this value depending on the system you want to trace
  * 0 = 32 Bits target
@@ -94,6 +94,6 @@
 
 /* SMI Settings */
 #define QEM_SMI_BLOCK_COUNT 8
-#define QEM_SMI_BLOCK_SIZE  1048576
+#define QEM_SMI_BLOCK_SIZE  10000000
 
 #endif /* __QEM_TRACE_CONFIG_H_ */

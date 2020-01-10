@@ -171,12 +171,19 @@ void qem_trace_output(uint32_t virt_addr, uint32_t phys_addr,
 {
     int32_t error;
 
-    /* Create the structure */
+#if QEM_TRACE_GATHER_META
+     /* Create the structure */
+     qem_trace_t new_trace = {
+         .address = phys_addr,
+         .timestamp = time,
+         .flags = (core & 0xFF) | (flags & 0xFFFFFF00)
+     };
+#else 
     qem_trace_t new_trace = {
-        .address = phys_addr,
-        .timestamp = time,
-        .flags = (core & 0xFF) | (flags & 0xFFFFFF00)
-    };
+         .address = phys_addr,
+         .flags = (uint8_t)flags
+     };
+#endif
 
     /* Send the structure */
     error = qem_smi_client_send(&new_trace, sizeof(qem_trace_t));

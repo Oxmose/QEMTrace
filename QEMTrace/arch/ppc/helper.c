@@ -82,6 +82,9 @@ void helper_qem_instld_trace(CPUPPCState *env, target_ulong current_eip,
     {
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_READ |
@@ -96,8 +99,6 @@ void helper_qem_instld_trace(CPUPPCState *env, target_ulong current_eip,
         qem_ppc_get_info_addr_mem_trace(env, current_eip, ACCESS_CODE, &haddr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
-
-        unsigned a, d;
 
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
@@ -120,6 +121,9 @@ void helper_qem_datast_trace_direct(CPUPPCState *env, target_ulong virt_addr,
     {
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
         
 
         /* Set flags */
@@ -135,7 +139,7 @@ void helper_qem_datast_trace_direct(CPUPPCState *env, target_ulong virt_addr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -156,6 +160,9 @@ void helper_qem_datast_ex_trace_direct(CPUPPCState *env, target_ulong virt_addr,
     {
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_WRITE |
@@ -169,7 +176,7 @@ void helper_qem_datast_ex_trace_direct(CPUPPCState *env, target_ulong virt_addr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -191,6 +198,9 @@ void helper_qem_datald_trace_direct(CPUPPCState *env, target_ulong virt_addr,
     {
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_READ |
@@ -204,7 +214,7 @@ void helper_qem_datald_trace_direct(CPUPPCState *env, target_ulong virt_addr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -226,6 +236,9 @@ void helper_qem_datald_ex_trace_direct(CPUPPCState *env, target_ulong virt_addr,
     {
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_ACCESS | QEM_TRACE_ACCESS_TYPE_READ |
@@ -239,7 +252,7 @@ void helper_qem_datald_ex_trace_direct(CPUPPCState *env, target_ulong virt_addr,
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -370,6 +383,9 @@ void helper_qem_dcache_flush_inval(CPUPPCState *env, int reg0, int reg1, int lev
 
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
 
             /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_FLUSH | QEM_TRACE_EVENT_INVALIDATE |
@@ -401,7 +417,7 @@ void helper_qem_dcache_flush_inval(CPUPPCState *env, int reg0, int reg1, int lev
                 break;
         }
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -424,6 +440,9 @@ void helper_qem_dcache_inval(CPUPPCState *env, int reg0, int reg1, int level,
 
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_INVALIDATE |
@@ -454,7 +473,7 @@ void helper_qem_dcache_inval(CPUPPCState *env, int reg0, int reg1, int level,
                  break;
          }
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -477,6 +496,9 @@ void helper_qem_dcache_flush(CPUPPCState *env, int reg0, int reg1, int level,
 
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_FLUSH |
@@ -512,7 +534,7 @@ void helper_qem_dcache_flush(CPUPPCState *env, int reg0, int reg1, int level,
                  break;
          }
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -535,6 +557,9 @@ void helper_qem_dcache_prefetch_non_inibited(CPUPPCState *env, int reg0, int reg
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_PREFETCH | QEM_TRACE_ACCESS_TYPE_READ |
@@ -554,7 +579,7 @@ void helper_qem_dcache_prefetch_non_inibited(CPUPPCState *env, int reg0, int reg
             flags |= QEM_TRACE_EVENT_EXCLUSIVE;
         }
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -577,6 +602,9 @@ void helper_qem_dcache_lock(CPUPPCState *env, int reg0, int reg1, int level,
 
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_LOCK |
                          QEM_TRACE_DATA_TYPE_DATA |
@@ -611,7 +639,7 @@ void helper_qem_dcache_lock(CPUPPCState *env, int reg0, int reg1, int level,
                  break;
         }
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -634,6 +662,9 @@ void helper_qem_dcache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
 
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_UNLOCK |
                          QEM_TRACE_DATA_TYPE_DATA |
@@ -663,7 +694,7 @@ void helper_qem_dcache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
                  break;
         }
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -685,6 +716,9 @@ void helper_qem_icache_inval(CPUPPCState *env, int reg0, int reg1, int level,
 
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_INVALIDATE |
                          QEM_TRACE_DATA_TYPE_INST |
@@ -714,7 +748,7 @@ void helper_qem_icache_inval(CPUPPCState *env, int reg0, int reg1, int level,
                  break;
          }
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -736,6 +770,9 @@ void helper_qem_icache_flush(CPUPPCState *env, int reg0, int reg1, int level,
 
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_FLUSH |
                          QEM_TRACE_DATA_TYPE_INST |
@@ -765,7 +802,7 @@ void helper_qem_icache_flush(CPUPPCState *env, int reg0, int reg1, int level,
                  break;
          }
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -787,6 +824,9 @@ void helper_qem_icache_lock(CPUPPCState *env, int reg0, int reg1, int level,
 
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_LOCK |
@@ -822,7 +862,7 @@ void helper_qem_icache_lock(CPUPPCState *env, int reg0, int reg1, int level,
                  break;
         }
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -845,6 +885,9 @@ void helper_qem_icache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
 
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_UNLOCK |
                          QEM_TRACE_DATA_TYPE_INST |
@@ -874,7 +917,7 @@ void helper_qem_icache_unlock(CPUPPCState *env, int reg0, int reg1, int level,
                  break;
         }
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -902,6 +945,9 @@ void helper_qem_icbt(CPUPPCState *env, int reg0, int reg1, int level)
         target_ulong virt_addr = env->gpr[reg0] + env->gpr[reg1];
 
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_PREFETCH | QEM_TRACE_ACCESS_TYPE_READ |
@@ -917,7 +963,7 @@ void helper_qem_icbt(CPUPPCState *env, int reg0, int reg1, int level)
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -939,6 +985,9 @@ void helper_qem_dcbz_trace_trad(CPUPPCState *env, int reg0, int reg1, int size)
 
         /* Get information about the adreess */
         target_ulong haddr;
+        unsigned a, d;
+        a = 0;
+        d = 0;
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_DCBZ | QEM_TRACE_ACCESS_TYPE_READ |
                          QEM_TRACE_DATA_TYPE_DATA;
@@ -950,7 +999,7 @@ void helper_qem_dcbz_trace_trad(CPUPPCState *env, int reg0, int reg1, int size)
                                     &wt_enable,
                                     &cache_inhibit, &coherency_enabled);
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -972,6 +1021,9 @@ void helper_qem_flash_inval_icache(CPUPPCState *env)
 
         /* Get information about the adreess */
         target_ulong haddr = 0;
+        unsigned a, d;
+        a = 0;
+        d = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_INVALIDATE |
@@ -984,7 +1036,7 @@ void helper_qem_flash_inval_icache(CPUPPCState *env)
         int32_t wt_enable = 0;
 
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
@@ -1006,6 +1058,9 @@ void helper_qem_flash_inval_dcache(CPUPPCState *env)
 
         /* Get information about the adreess */
         target_ulong haddr = 0;
+        unsigned a, d;
+        a = 0;
+        d = 0;
 
         /* Set flags */
         uint32_t flags = QEM_TRACE_EVENT_INVALIDATE |
@@ -1018,7 +1073,7 @@ void helper_qem_flash_inval_dcache(CPUPPCState *env)
         int32_t wt_enable = 0;
 
 
-        unsigned a, d;
+        
         GET_ENV_FLAGS(flags, a, d, wt_enable, cache_inhibit,
                       coherency_enabled, size)
 #else 
