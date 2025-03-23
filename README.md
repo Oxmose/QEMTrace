@@ -55,7 +55,7 @@ main methods being email and IRC
  - #qemu on irc.oftc.net
 
 ## Publication
-Todo: Publication link
+[https://dl.acm.org/doi/abs/10.5555/3427510.3427518](https://dl.acm.org/doi/abs/10.5555/3427510.3427518)
 
 ### Links
 QEMU: [https://www.qemu.org](https://www.qemu.org)
